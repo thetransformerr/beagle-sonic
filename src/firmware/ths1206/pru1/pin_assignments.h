@@ -27,7 +27,7 @@
 #define PA_RA1_BIT      PA_D11_BIT
 
 #define PA_RW_BIT       12
-#define PA_WR_BIT       PA_WR_BIT
+#define PA_WR_BIT       PA_RW_BIT
 #define PA_RD_BIT       13
 
 #define PA_DATA_AV_BIT  14
