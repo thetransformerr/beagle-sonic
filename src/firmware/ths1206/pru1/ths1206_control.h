@@ -10,6 +10,8 @@
 #ifndef THS1206_CONTROL_H_
 #define THS1206_CONTROL_H_
 
+#include <stdint.h>
+
 #include "pin_assignments.h"
 
 #define TC_CSR0_BIT     PA_D10_BIT
@@ -74,5 +76,9 @@
 #define TC_RBACK_DEBUG     1
 
 
+// TODO: Figure out what options should be exposed
+void TC_init();
+void TC_write( uint32_t value );
+uint32_t TC_read();
 
 #endif /* THS1206_CONTROL_H_ */
