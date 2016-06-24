@@ -1,0 +1,34 @@
+/*
+ * pin_control.h
+ *
+ * Description:
+ *
+ * (C) 2016 Visaoni
+ * Licensed under the MIT License.
+ */
+
+// TODO: Get rid of this duplication nonsense with PRU0/1
+
+#ifndef PIN_CONTROL_H_
+#define PIN_CONTROL_H_
+
+#include <stdint.h>
+
+
+volatile register uint32_t __R30;
+volatile register uint32_t __R31;
+
+void set_pin( uint32_t bit );
+void set_pin( uint32_t bit )
+{
+   __R30 |= 1 << bit;
+}
+
+void clear_pin( uint32_t bit );
+void clear_pin( uint32_t bit )
+{
+   __R30 &= ~(1 << bit);
+}
+
+
+#endif /* PIN_CONTROL_H_ */
