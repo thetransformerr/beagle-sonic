@@ -15,8 +15,8 @@
 #include <stdint.h>
 
 
-static volatile register uint32_t __R30;
-static volatile register uint32_t __R31;
+volatile register uint32_t __R30;
+volatile register uint32_t __R31;
 
 void set_pin( uint32_t bit );
 void set_pin( uint32_t bit )
