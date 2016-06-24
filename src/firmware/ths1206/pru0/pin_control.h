@@ -15,8 +15,8 @@
 #include <stdint.h>
 
 
-volatile register uint32_t __R30;
-volatile register uint32_t __R31;
+static volatile register uint32_t __R30;
+static volatile register uint32_t __R31;
 
 void set_pin( uint32_t bit );
 void set_pin( uint32_t bit )
@@ -28,6 +28,11 @@ void clear_pin( uint32_t bit );
 void clear_pin( uint32_t bit )
 {
    __R30 &= ~(1 << bit);
+}
+
+void write_reg( uint32_t value )
+{
+   __R30 = value;
 }
 
 
