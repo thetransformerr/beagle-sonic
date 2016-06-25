@@ -10,11 +10,18 @@
 #include <stdint.h>
 #include "resource_table_empty.h"
 
-#include "pin_assignments.h"
 #include "ths1206_control.h"
+#include "store_readings.h"
+
+#define READS_PER_ROUND 2000
 
 int main(void)
 {
+   while(1)
+   {
+      TC_store_next_n_reads( READS_PER_ROUND );
+      SR_transfer_readings();
+   }
 
    __halt();
 
