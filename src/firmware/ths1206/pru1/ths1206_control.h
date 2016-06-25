@@ -14,6 +14,8 @@
 
 #include "pin_assignments.h"
 
+#define TC_TRIGGER_LEVEL 1
+
 #define TC_CSR0_BIT     PA_D10_BIT
 
 #define TC_VREF_BIT     PA_D0_BIT
@@ -80,5 +82,6 @@
 void TC_init();
 void TC_write( uint32_t value );
 uint32_t TC_read();
+void TC_store_next_n_reads( uint32_t n );
 
 #endif /* THS1206_CONTROL_H_ */

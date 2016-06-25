@@ -12,6 +12,7 @@
 
 #include "ths1206_control.h"
 #include "pin_control.h"
+#include "store_readings.h"
 
 void TC_init()
 {
@@ -50,4 +51,25 @@ uint32_t TC_read()
    set_pin( PA_RD_BIT );
    __delay_cycles(1);   // Probably extraneous, needs 5 ns delay to CS invalid, but CS tied active
    return result;
+}
+
+void TC_store_next_n_reads( uint32_t n )
+{
+   // TODO: Handle n % TC_TRIGGER_LEVEL != 0 case better
+   uint32_t i;
+   for( i = 0; i < n; i += TC_TRIGGER_LEVEL )
+   {
+      // Note: DATA_AV defaults to an active high pulse with width half CONV_CLK input
+      // Busy wait here should catch it
+      while( !read_pin( PA_DATA_AV_BIT ) )
+      {
+         int j;
+         for( j = 0; j < TC_TRIGGER_LEVEL; j++ )
+         {
+            SR_store( TC_read() );
+         }
+         // Shouldn't need a delay here - typical time to DATA_AV inactive is 12ns
+            // No range given though
+      }
+   }
 }
