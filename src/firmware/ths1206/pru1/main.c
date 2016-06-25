@@ -10,6 +10,9 @@
 #include <stdint.h>
 #include "resource_table_empty.h"
 
+#include "pin_assignments.h"
+#include "ths1206_control.h"
+
 int main(void)
 {
 
