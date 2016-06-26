@@ -61,15 +61,14 @@ void TC_store_next_n_reads( uint32_t n )
    {
       // Note: DATA_AV defaults to an active high pulse with width half CONV_CLK input
       // Busy wait here should catch it
-      while( !read_pin( PA_DATA_AV_BIT ) )
+      while( !read_pin( PA_DATA_AV_BIT ) );
+
+      int j;
+      for( j = 0; j < TC_TRIGGER_LEVEL; j++ )
       {
-         int j;
-         for( j = 0; j < TC_TRIGGER_LEVEL; j++ )
-         {
-            SR_store( TC_read() );
-         }
-         // Shouldn't need a delay here - typical time to DATA_AV inactive is 12ns
-            // No range given though
+         SR_store( TC_read() );
       }
+      // Shouldn't need a delay here - typical time to DATA_AV inactive is 12ns
+         // No range given though
    }
 }
