@@ -48,7 +48,7 @@ void SR_init()
    volatile uint8_t* status;
 
    // Enable OCP master port access for the PRU
-//   CT_CFG.SYSCFG_bit.STANDBY_INIT = 0;  // Uh, this might be important...
+   CT_CFG.SYSCFG_bit.STANDBY_INIT = 0;
 
    // Wait for linux driver ready
    status = &resourceTable.rpmsg_vdev.status;
