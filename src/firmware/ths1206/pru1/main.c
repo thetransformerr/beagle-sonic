@@ -8,7 +8,7 @@
  **************************************************************************************/
 
 #include <stdint.h>
-#include "resource_table_1.h"
+//#include "resource_table_1.h"  // Conflicts at link with #include in store_readings.c
 
 #include "ths1206_control.h"
 #include "store_readings.h"

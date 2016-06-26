@@ -14,6 +14,7 @@
 
 #define SR_MAX_BUFFER_SIZE 1750
 
+void SR_init();
 uint32_t SR_store( uint32_t value );
 void SR_transfer_readings();
 
