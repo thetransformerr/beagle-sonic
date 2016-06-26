@@ -17,6 +17,9 @@
 
 int main(void)
 {
+   SR_init();
+   TC_init();
+
    while(1)
    {
       TC_store_next_n_reads( READS_PER_ROUND );
