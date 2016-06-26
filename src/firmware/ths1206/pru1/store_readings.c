@@ -33,22 +33,24 @@
 // Header size uncertain - might be 16B?
 #define MAX_ELEMENTS_TO_TRANSFER 100
 
-#define SRC CHAN_PORT
-// From RPMsg character device module source
-#define DST 53
-
 static uint32_t buffer[ SR_MAX_BUFFER_SIZE ];
 static size_t head = 0;
 
 static struct pru_rpmsg_transport transport;
-
+static uint16_t src, dst;
 
 void SR_init()
 {
    volatile uint8_t* status;
 
+   uint8_t dummy_buffer[ RPMSG_BUF_SIZE ];
+   uint16_t dummy_len;
+
    // Enable OCP master port access for the PRU
    CT_CFG.SYSCFG_bit.STANDBY_INIT = 0;
+
+   // Clear incoming message flag
+   CT_INTC.SICR_bit.STS_CLR_IDX = FROM_ARM_HOST;
 
    // Wait for linux driver ready
    status = &resourceTable.rpmsg_vdev.status;
@@ -58,6 +60,11 @@ void SR_init()
 
    // Create RPMsg channel
    while( pru_rpmsg_channel( RPMSG_NS_CREATE, &transport, CHAN_NAME, CHAN_DESC, CHAN_PORT) != PRU_RPMSG_SUCCESS );
+
+   // Wait for incoming message to grab src and dst
+   while( (!read_pin(31))
+         && (pru_rpmsg_receive( &transport, &dst, &src, dummy_buffer, &dummy_len ) == PRU_RPMSG_SUCCESS) );
+
 }
 
 uint32_t SR_store( uint32_t reading )
@@ -86,7 +93,7 @@ void SR_transfer_readings()
       uint16_t len = (i + MAX_ELEMENTS_TO_TRANSFER > head ? head - i : MAX_ELEMENTS_TO_TRANSFER) * sizeof buffer[0];
 
       // TODO: Probably ignores some conditions that can't be fixed by waiting
-      while( pru_rpmsg_send( &transport, DST, SRC, buffer + i, len ) != PRU_RPMSG_SUCCESS );
+      while( pru_rpmsg_send( &transport, src, dst, buffer + i, len ) != PRU_RPMSG_SUCCESS );
 
       i += MAX_ELEMENTS_TO_TRANSFER;
    }
@@ -103,5 +110,3 @@ void SR_transfer_readings()
 #undef CHAN_PORT
 #undef VIRTIO_CONFIG_S_DRIVER_OK
 #undef MAX_ELEMENTS_TO_TRANSFER
-#undef SRC
-#undef DST
