@@ -33,9 +33,9 @@
 // Header size uncertain - might be 16B?
 #define MAX_ELEMENTS_TO_TRANSFER 100
 
-// Basically throwaways just to pass along something
-#define SRC 1
-#define DST 2
+#define SRC CHAN_PORT
+// From RPMsg character device module source
+#define DST 53
 
 static uint32_t buffer[ SR_MAX_BUFFER_SIZE ];
 static size_t head = 0;
