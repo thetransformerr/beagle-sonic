@@ -1,37 +1,13 @@
-# This file is a slightly modified version of:
-# Makefile to make PRU_inlineASM_blinky project
-# Copyright (c) 2016 Zubeen Tolani <ZeekHuge - zeekhuge@gmail.com>
-#
-
-# PRU_CGT environment variable must point to the TI PRU compiler directory
-#
-# PRU_SUPPORT environment variable must point to PRU software support package 
-#             providing header files such as rsc_types.h
-
+# PRU_CGT environment variable must point to the TI PRU compiler directory. E.g.:
+#(Linux) export PRU_CGT=/home/jason/ti/ccs_v6_1_0/ccsv6/tools/compiler/ti-cgt-pru_2.1.0
+#(Windows) set PRU_CGT=C:/TI/ccs_v6_0_1/ccsv6/tools/compiler/ti-cgt-pru_2.1.0
 ifndef PRU_CGT
 define ERROR_BODY
 
 ************************************************************
-PRU_CGT environment variable is not set. Example:
-  export PRU_CGT=/opt/ti/ti-cgt-pru_2.1.0
-
-Download for PRU code generation tools
-http://software-dl.ti.com/codegen/non-esd/downloads/download.htm#PRU
-************************************************************
-
-endef
-$(error $(ERROR_BODY))
-endif
-
-ifndef PRU_SUPPORT
-define ERROR_BODY
-
-************************************************************
-PRU_SUPPORT environment variable is not set. Example:
-  export PRU_SUPPORT=/opt/ti/pru-software-support-package
-
-Download for PRU software support package 
-https://github.com/jadonk/pru-software-support-package
+PRU_CGT environment variable is not set. Examples given:
+(Linux) export PRU_CGT=/home/jason/ti/ccs_v6_1_0/ccsv6/tools/compiler/ti-cgt-pru_2.1.0
+(Windows) set PRU_CGT=C:/TI/ccs_v6_0_1/ccsv6/tools/compiler/ti-cgt-pru_2.1.0
 ************************************************************
 
 endef
@@ -42,8 +18,8 @@ MKFILE_PATH := $(abspath $(lastword $(MAKEFILE_LIST)))
 CURRENT_DIR := $(notdir $(patsubst %/,%,$(dir $(MKFILE_PATH))))
 PROJ_NAME=$(CURRENT_DIR)
 LINKER_COMMAND_FILE=./AM335x_PRU.cmd
-#LIBS=--library=../../../lib/rpmsg_lib.lib
-INCLUDE=--include_path=$(PRU_CGT)/include --include_path=$(PRU_SUPPORT)/include
+LIBS=--library=../../../lib/rpmsg_lib.lib
+INCLUDE=--include_path=../../../include --include_path=../../../include/am335x
 STACK_SIZE=0x100
 HEAP_SIZE=0x100
 GEN_DIR=gen
