@@ -8,7 +8,7 @@
  **************************************************************************************/
 
 #include <stdint.h>
-#include "resource_table_empty.h"
+#include "resource_table_1.h"
 
 #include "ths1206_control.h"
 #include "store_readings.h"
