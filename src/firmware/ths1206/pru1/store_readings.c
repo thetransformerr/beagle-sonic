@@ -16,6 +16,8 @@
 #include <pru_rpmsg.h>
 #include "resource_table_1.h"
 
+#include "pin_control.h"
+
 // Defines mostly lifted from pru-support-package lab5
 #define HOST_INT        ((uint32_t) 1 << 31)
 
