@@ -25,7 +25,7 @@ void clear_pin( uint32_t bit )
 // TODO: Convert to 0/1?
 uint32_t read_pin( uint32_t bit )
 {
-   return __R31 & ~(1 << bit);
+   return __R31 & (1 << bit);
 }
 
 void write_reg( uint32_t value )
