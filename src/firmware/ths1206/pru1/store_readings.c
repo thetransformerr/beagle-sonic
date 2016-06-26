@@ -85,7 +85,8 @@ void SR_transfer_readings()
    {
       uint16_t len = (i + MAX_ELEMENTS_TO_TRANSFER > head ? head - i : MAX_ELEMENTS_TO_TRANSFER) * sizeof buffer[0];
 
-      pru_rpmsg_send( &transport, DST, SRC, buffer + i, len );
+      // TODO: Probably ignores some conditions that can't be fixed by waiting
+      while( pru_rpmsg_send( &transport, DST, SRC, buffer + i, len ) != PRU_RPMSG_SUCCESS );
 
       i += MAX_ELEMENTS_TO_TRANSFER;
    }
