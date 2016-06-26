@@ -38,7 +38,7 @@
 #define DST 2
 
 static uint32_t buffer[ SR_MAX_BUFFER_SIZE ];
-static uint32_t head = 0;
+static size_t head = 0;
 
 static struct pru_rpmsg_transport transport;
 
@@ -80,7 +80,7 @@ void SR_transfer_readings()
 {
    if( head <= 0 ) return;
 
-   uint32_t i = 0;
+   size_t i = 0;
    while( i < head )
    {
       uint16_t len = (i + MAX_ELEMENTS_TO_TRANSFER > head ? head - i : MAX_ELEMENTS_TO_TRANSFER) * sizeof buffer[0];
