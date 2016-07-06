@@ -64,8 +64,18 @@ void SR_init()
    while( pru_rpmsg_channel( RPMSG_NS_CREATE, &transport, CHAN_NAME, CHAN_DESC, CHAN_PORT) != PRU_RPMSG_SUCCESS );
 
    // Wait for incoming message to grab src and dst
-   while( (!read_pin(31))
-         && (pru_rpmsg_receive( &transport, &dst, &src, dummy_buffer, &dummy_len ) == PRU_RPMSG_SUCCESS) );
+   while(1)
+   {
+      if( read_pin( 31 ) )
+      {
+         CT_INTC.SICR_bit.STS_CLR_IDX = FROM_ARM_HOST;
+
+         if( pru_rpmsg_receive( &transport, &dst, &src, dummy_buffer, &dummy_len ) == PRU_RPMSG_SUCCESS )
+         {
+            break;
+         }
+      }
+   }
 
 }
 
