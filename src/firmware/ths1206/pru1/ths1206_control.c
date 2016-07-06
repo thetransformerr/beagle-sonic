@@ -39,15 +39,15 @@ void TC_write( uint32_t value )
    __delay_cycles(1);   // Probably extraneous, needs 2 ns
 }
 
-uint32_t TC_read()
+uint16_t TC_read()
 {
-   uint32_t result;
+   uint16_t result;
 
    set_pin( PA_WR_BIT );
    clear_pin( PA_RD_BIT );
    __delay_cycles(2);   // 10ns delay until data ready
 
-   result = read_reg();
+   result = (uint16_t)read_reg();
    set_pin( PA_RD_BIT );
    __delay_cycles(1);   // Probably extraneous, needs 5 ns delay to CS invalid, but CS tied active
    return result;

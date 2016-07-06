@@ -81,7 +81,7 @@
 // TODO: Figure out what options should be exposed
 void TC_init();
 void TC_write( uint32_t value );
-uint32_t TC_read();
+uint16_t TC_read();
 void TC_store_next_n_reads( uint32_t n );
 
 #endif /* THS1206_CONTROL_H_ */

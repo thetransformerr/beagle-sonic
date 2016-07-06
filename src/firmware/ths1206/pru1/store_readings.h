@@ -12,10 +12,10 @@
 
 #include <stdint.h>
 
-#define SR_MAX_BUFFER_SIZE 1750
+#define SR_MAX_BUFFER_SIZE 3500
 
 void SR_init();
-uint32_t SR_store( uint32_t value );
+uint32_t SR_store( uint16_t value );
 void SR_transfer_readings();
 
 #endif /* STORE_READINGS_H_ */

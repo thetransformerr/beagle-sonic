@@ -35,7 +35,7 @@
 // Header size uncertain - might be 16B?
 #define MAX_ELEMENTS_TO_TRANSFER 100
 
-static uint32_t buffer[ SR_MAX_BUFFER_SIZE ];
+static uint16_t buffer[ SR_MAX_BUFFER_SIZE ];
 static size_t head = 0;
 
 static struct pru_rpmsg_transport transport;
@@ -69,12 +69,12 @@ void SR_init()
 
 }
 
-uint32_t SR_store( uint32_t reading )
+uint32_t SR_store( uint16_t reading )
 {
    // TODO: Added in shared RAM too? Currently using just 7KB of PRU1 RAM
-   // Limited size is a problem. Even with all of PRU1 RAM and Shared PRU RAM only ~5k readings
-   // Max coverage of ~0.8 ms, rough estimate of average tof is ~1.5ms
-   // Current coverage is just under 0.3ms with 1750 readings
+   // Limited size is a problem. Even with all of PRU1 RAM and Shared PRU RAM only ~10k readings
+   // Max coverage of ~1.6 ms, rough estimate of average tof is ~1.5ms
+   // Current coverage is just under 0.6ms with 3500 readings
    // Will need to delay recording
 
    if( head < SR_MAX_BUFFER_SIZE )
