@@ -18,7 +18,7 @@
 int main(void)
 {
    SR_init();
-   TC_init();
+   TC_init( TC_ACCEPT_DEFAULTS );
 
    while(1)
    {

@@ -78,8 +78,14 @@
 #define TC_RBACK_DEBUG     1
 
 
-// TODO: Figure out what options should be exposed
-void TC_init();
+#define TC_ACCEPT_DEFAULTS 1
+#define TC_SET_CR          0
+
+void TC_set_CSR0( uint16_t value );
+void TC_set_CSR1( uint16_t value );
+void TC_set_CSR0_bit( uint32_t bit, uint8_t value );
+void TC_set_CSR1_bit( uint32_t bit, uint8_t value );
+void TC_init( uint8_t use_defaults );
 void TC_write( uint16_t value );
 uint16_t TC_read();
 void TC_store_next_n_reads( uint32_t n );
