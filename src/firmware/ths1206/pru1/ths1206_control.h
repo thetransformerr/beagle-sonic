@@ -80,7 +80,7 @@
 
 // TODO: Figure out what options should be exposed
 void TC_init();
-void TC_write( uint32_t value );
+void TC_write( uint16_t value );
 uint16_t TC_read();
 void TC_store_next_n_reads( uint32_t n );
 

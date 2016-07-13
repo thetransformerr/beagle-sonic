@@ -26,13 +26,13 @@ void TC_init()
    // TODO: set D0-11 to input
 }
 
-void TC_write( uint32_t value )
+void TC_write( uint16_t value )
 {
    set_pin( PA_WR_BIT );   // Needed? shouldn't hurt
    set_pin( PA_RD_BIT );
    clear_pin( PA_WR_BIT );
 
-   write_reg( value );
+   write_reg( (uint32_t) value );
    __delay_cycles(2);
 
    set_pin( PA_WR_BIT );
