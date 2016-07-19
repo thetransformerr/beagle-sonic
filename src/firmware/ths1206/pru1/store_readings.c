@@ -35,6 +35,7 @@
 // Header size uncertain - might be 16B?
 #define MAX_ELEMENTS_TO_TRANSFER 100
 
+static uint8_t dummy_buffer[ RPMSG_BUF_SIZE ];
 static uint16_t buffer[ SR_MAX_BUFFER_SIZE ];
 static size_t head = 0;
 
@@ -45,7 +46,6 @@ void SR_init()
 {
    volatile uint8_t* status;
 
-   uint8_t dummy_buffer[ RPMSG_BUF_SIZE ];
    uint16_t dummy_len;
 
    // Enable OCP master port access for the PRU
