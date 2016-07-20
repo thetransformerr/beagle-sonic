@@ -50,7 +50,7 @@ int main(void)
 
    if( pollfds[0].fd < 0 )
    {
-      printf( "Unable to open char device." );
+      printf( "Unable to open char device.\n" );
       return -1;
    }
 
@@ -59,26 +59,26 @@ int main(void)
    // TODO: Should probably handle errors better
    while( write( pollfds[0].fd, "s", 1 ) < 0 )
    {
-      printf( "Problem with initial send. Retrying..." );
+      printf( "Problem with initial send. Retrying...\n" );
    }
 
 
    while(1)
    {
-      printf( "Gathering data..." );
+      printf( "Gathering data...\n" );
       // Grab a whole run and then process
       // TODO: Figure out of this is sufficient or if incremental processing is required for performance
       size_t total_bytes = 0;
       while( total_bytes < MAX_BUFFER_SIZE )
       {
-         printf( "   %u of %u bytes", total_bytes, MAX_BUFFER_SIZE);
+         printf( "   %u of %u bytes\n", total_bytes, MAX_BUFFER_SIZE);
          total_bytes += read( pollfds[0].fd, buffer + total_bytes, MAX_BUFFER_SIZE - total_bytes );
       }
 
       // reads and buffer are aliased
       double tof = find_tof( reads );
-      printf( "Time of flight: %d ns", tof );
+      printf( "Time of flight: %d ns\n", tof );
    }
 
-	return 0;
+   return 0;
 }
