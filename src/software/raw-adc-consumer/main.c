@@ -77,7 +77,7 @@ int main(void)
 
       // reads and buffer are aliased
       double tof = find_tof( reads );
-      printf( "Time of flight: %d ns\n", tof );
+      printf( "Time of flight: %f ns\n", tof );
    }
 
    return 0;
