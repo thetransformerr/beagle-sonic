@@ -65,11 +65,13 @@ int main(void)
 
    while(1)
    {
+      printf( "Gathering data..." );
       // Grab a whole run and then process
       // TODO: Figure out of this is sufficient or if incremental processing is required for performance
       size_t total_bytes = 0;
       while( total_bytes < MAX_BUFFER_SIZE )
       {
+         printf( "   %u of %u bytes", total_bytes, MAX_BUFFER_SIZE);
          total_bytes += read( pollfds[0].fd, buffer + total_bytes, MAX_BUFFER_SIZE - total_bytes );
       }
 
