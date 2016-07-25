@@ -12,8 +12,7 @@
 
 #include "ths1206_control.h"
 #include "store_readings.h"
-
-#define READS_PER_ROUND 2000
+#include "common_constants.h"
 
 int main(void)
 {
@@ -22,7 +21,7 @@ int main(void)
 
    while(1)
    {
-      TC_store_next_n_reads( READS_PER_ROUND );
+      TC_store_next_n_reads( CC_READS_PER_ROUND );
       SR_transfer_readings();
    }
 
