@@ -11,8 +11,9 @@
 #define STORE_READINGS_H_
 
 #include <stdint.h>
+#include "common_constants.h"
 
-#define SR_MAX_BUFFER_SIZE 3500
+#define SR_MAX_BUFFER_SIZE CC_READS_PER_ROUND
 
 void SR_init();
 uint32_t SR_store( uint16_t value );
