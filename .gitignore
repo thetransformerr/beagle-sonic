@@ -3,3 +3,4 @@ Release/
 .xdchelp
 gen/
 *.out
+*.d
