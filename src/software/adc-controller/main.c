@@ -119,5 +119,7 @@ int main(void)
       }
    }
 
+   close( pollfds[0].fd );
+
    return 0;
 }
