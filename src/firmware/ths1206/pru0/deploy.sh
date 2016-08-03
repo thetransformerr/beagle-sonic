@@ -1,5 +1,6 @@
 #! /bin/bash
 
+set -e
 make clean
 make
 cp gen/*.out /lib/firmware/am335x-pru0-fw
