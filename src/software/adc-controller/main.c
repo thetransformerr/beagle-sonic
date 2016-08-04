@@ -55,6 +55,7 @@ void set_pins_in()
 
 int main(void)
 {
+   printf( "ADC Driver starting\n" );
    uint8_t buffer[ MAX_BUFFER_SIZE ];
    uint16_t* reads = (uint16_t*)buffer;   // Assumes little-endian
 
@@ -86,6 +87,7 @@ int main(void)
       switch( msg )
       {
          case CC_REQ_CONFIG:
+            printf( "Setting pins to gpio out\n" );
             set_pins_out();
             msg = CC_FIN_CONFIG;
             while( write( pollfds[0].fd, &msg, 1 ) < 0 )
