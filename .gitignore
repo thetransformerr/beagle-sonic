@@ -4,3 +4,4 @@ Release/
 gen/
 *.out
 *.d
+*.o
