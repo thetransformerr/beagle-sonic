@@ -4,8 +4,7 @@ INCLUDES=-I../../share
 SOURCES=$(wildcard *.c)
 OBJECTS=$(SOURCES:.c=.o)
 
-OUTNAME=adc-controller
-OUTPUT_OPTION = -o $(OUTNAME)
+OUTNAME=adc-controller.out
 
 DEPDIR := .d
 $(shell mkdir -p $(DEPDIR) >/dev/null)
@@ -17,10 +16,11 @@ POSTCOMPILE = mv -f $(DEPDIR)/$*.Td $(DEPDIR)/$*.d
 .PHONY: clean
 
 all: $(OBJECTS)
+	$(CC) $(CFLAGS) $(INCLUDES) -o $(OUTNAME) main.c
 
 %.o : %.c
 %.o : %.c $(DEPDIR)/%.d
-			$(COMPILE.c) $(OUTPUT_OPTION) $<
+			$(COMPILE.c) $<
 			$(POSTCOMPILE)
 
 $(DEPDIR)/%.d: ;
