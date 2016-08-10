@@ -14,7 +14,6 @@
 
 #include "pin_assignments.h"
 
-#define TC_TRIGGER_LEVEL 1
 
 #define TC_CSR0_BIT     PA_D10_BIT
 

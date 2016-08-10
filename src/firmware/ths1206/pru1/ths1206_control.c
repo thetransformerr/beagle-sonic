@@ -15,6 +15,9 @@
 #include "store_readings.h"
 
 
+static uint8_t trigger_level = 1;
+
+
 void TC_init_defaults()
 {
    TC_write( TC_CSR1_BIT | TC_RESET_BIT );  // Sets reset in CR1
@@ -23,6 +26,27 @@ void TC_init_defaults()
 
 void TC_init( uint16_t CSR0, uint16_t CSR1 )
 {
+   // TODO: In general, should account for multiple channels
+   //       Won't use more than one here though
+   //       Doesn't follow nice patterns with multiple channels
+   //       Up to 4 channels selected with 5 bits
+   if(      (CSR1 & TC_TRIG0_BIT) == 0 && (CSR1 & TC_TRIG1_BIT) == 0 )
+   {
+      trigger_level = 1;
+   }
+   else if( (CSR1 & TC_TRIG0_BIT) == 1 && (CSR1 & TC_TRIG1_BIT) == 0 )
+   {
+      trigger_level = 4;
+   }
+   else if( (CSR1 & TC_TRIG0_BIT) == 0 && (CSR1 & TC_TRIG1_BIT) == 1 )
+   {
+      trigger_level = 8;
+   }
+   else if( (CSR1 & TC_TRIG0_BIT) == 1 && (CSR1 & TC_TRIG1_BIT) == 1 )
+   {
+      trigger_level = 14;
+   }
+
    TC_init_defaults();
 
    TC_write( CSR0 );
@@ -58,16 +82,16 @@ uint16_t TC_read()
 
 void TC_store_next_n_reads( uint32_t n )
 {
-   // TODO: Handle n % TC_TRIGGER_LEVEL != 0 case better
+   // TODO: Handle n % trigger_level != 0 case better
    uint32_t i;
-   for( i = 0; i < n; i += TC_TRIGGER_LEVEL )
+   for( i = 0; i < n; i += trigger_level )
    {
       // Note: DATA_AV defaults to an active high pulse with width half CONV_CLK input
       // Busy wait here should catch it
       while( !read_pin( PA_DATA_AV_BIT ) );
 
       int j;
-      for( j = 0; j < TC_TRIGGER_LEVEL; j++ )
+      for( j = 0; j < trigger_level; j++ )
       {
          SR_store( TC_read() );
       }
