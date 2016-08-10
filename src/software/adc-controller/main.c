@@ -7,6 +7,7 @@
  * Licensed under the MIT License.
  **************************************************************************************/
 
+#include <stdlib.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <unistd.h>
@@ -25,6 +26,11 @@
 #define CHARACTER_DEVICE_PATH    "/dev/rpmsg_pru31"
 #define MAX_BUFFER_SIZE          (BYTES_PER_READ * READS_PER_TX)
 
+#define CMD_BUFFER_SIZE          80
+
+// TODO: Figure out how to share these values with the firmware...
+//       Firmware just cares about bits in R30/R31. Need some way to relate the two nicely
+char* pins_array[] = { "P8_45", "P8_46", "P8_43", "P8_44", "P8_41", "P8_42", "P8_39", "P8_40", "P8_27", "P8_29", "P8_28", "P8_30" };
 
 double find_tof( uint16_t reads[] )
 {
@@ -41,16 +47,30 @@ double find_tof( uint16_t reads[] )
    return DELAY_TIME_NS + max * TIME_BETWEEN_READS_NS;
 }
 
+void set_pins( char setting[] )
+{
+   char cmd[ CMD_BUFFER_SIZE ];
+
+   size_t i;
+   for( i = 0; i < (sizeof pins_array / sizeof pins_array[0]); i++ )
+   {
+      // TODO: Check for and handle errors somehow
+      char* pin = pins_array[i];
+      snprintf( cmd, sizeof cmd, "config-pin %s %s", pin, setting );
+      printf( "Running: %s\n", cmd );
+      // TODO: Check for and handle errors somehow
+      system( cmd );
+   }
+}
+
 void set_pins_out()
 {
-   // TODO: Configure pins appropriately
-   return;
+   set_pins( "pruout" );
 }
 
 void set_pins_in()
 {
-   // TODO: Configure pins appropriately
-   return;
+   set_pins( "pruin" );
 }
 
 int main(void)
