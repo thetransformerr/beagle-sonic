@@ -17,9 +17,8 @@
 
 void TC_init_defaults()
 {
-   // TODO: Make this not reliant on assumed pinout
-   TC_write( 0x401 );  // Sets reset in CR1
-   TC_write( 0x400 );  // Clear reset in CR1
+   TC_write( TC_CSR1_BIT | TC_RESET_BIT );  // Sets reset in CR1
+   TC_write( TC_CSR1_BIT );  // Clear reset in CR1
 }
 
 void TC_init( uint16_t CSR0, uint16_t CSR1 )
