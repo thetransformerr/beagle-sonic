@@ -75,3 +75,25 @@ void TC_store_next_n_reads( uint32_t n )
          // No range given though
    }
 }
+
+uint8_t TC_test()
+{
+   TC_init( TC_CSR0_BIT | TC_TEST0_BIT, TC_CSR1_BIT );
+   uint16_t v_max = TC_read();
+
+   TC_init( TC_CSR0_BIT | TC_TEST1_BIT, TC_CSR1_BIT );
+   uint16_t v_mid = TC_read();
+
+   TC_init( TC_CSR0_BIT | TC_TEST0_BIT | TC_TEST1_BIT, TC_CSR1_BIT );
+   uint16_t v_min = TC_read();
+
+   if( v_min < v_mid && v_mid < v_max )
+   {
+      return 0;
+   }
+   else
+   {
+      // TODO: Add more descriptive errors
+      return -1;
+   }
+}

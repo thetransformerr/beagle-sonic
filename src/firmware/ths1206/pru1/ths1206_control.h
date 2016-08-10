@@ -83,5 +83,6 @@ void TC_init( uint16_t CSR0, uint16_t CSR1 );
 void TC_write( uint16_t value );
 uint16_t TC_read();
 void TC_store_next_n_reads( uint32_t n );
+uint8_t TC_test();
 
 #endif /* THS1206_CONTROL_H_ */
