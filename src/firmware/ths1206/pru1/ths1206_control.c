@@ -23,7 +23,6 @@ void TC_set_CSR1_bit( uint32_t bit, uint8_t value ) { CSR1_Value |= (uint32_t) (
 
 void TC_init( uint8_t use_defaults )
 {
-   // TODO: better to ensure D0-11 are output or assume it starts valid?
    // TODO: Make this not reliant on assumed pinout
    TC_write( 0x401 );  // Sets reset in CR1
    TC_write( 0x400 );  // Clear reset in CR1
@@ -33,7 +32,6 @@ void TC_init( uint8_t use_defaults )
       TC_write( CSR0_Value );
       TC_write( CSR1_Value );
    }
-   // TODO: set D0-11 to input
 }
 
 void TC_write( uint16_t value )
