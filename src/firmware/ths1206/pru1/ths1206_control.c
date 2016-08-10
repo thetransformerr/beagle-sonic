@@ -100,7 +100,7 @@ void TC_store_next_n_reads( uint32_t n )
    }
 }
 
-uint8_t TC_test()
+int8_t TC_test()
 {
    TC_init( TC_CSR0_BIT | TC_TEST0_BIT, TC_CSR1_BIT );
    uint16_t v_max = TC_read();
