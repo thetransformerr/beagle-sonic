@@ -78,14 +78,8 @@
 #define TC_RBACK_DEBUG     1
 
 
-#define TC_ACCEPT_DEFAULTS 1
-#define TC_SET_CR          0
-
-void TC_set_CSR0( uint16_t value );
-void TC_set_CSR1( uint16_t value );
-void TC_set_CSR0_bit( uint32_t bit, uint8_t value );
-void TC_set_CSR1_bit( uint32_t bit, uint8_t value );
-void TC_init( uint8_t use_defaults );
+void TC_init_defaults();
+void TC_init( uint16_t CSR0, uint16_t CSR1 );
 void TC_write( uint16_t value );
 uint16_t TC_read();
 void TC_store_next_n_reads( uint32_t n );

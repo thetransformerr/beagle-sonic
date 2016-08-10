@@ -14,24 +14,20 @@
 #include "pin_control.h"
 #include "store_readings.h"
 
-static uint16_t CSR0_Value, CSR1_Value = 0;
 
-void TC_set_CSR0( uint16_t value ) { CSR0_Value = value; }
-void TC_set_CSR1( uint16_t value ) { CSR1_Value = value; }
-void TC_set_CSR0_bit( uint32_t bit, uint8_t value ) { CSR0_Value |= (uint32_t) ( value << bit ); }
-void TC_set_CSR1_bit( uint32_t bit, uint8_t value ) { CSR1_Value |= (uint32_t) ( value << bit ); }
-
-void TC_init( uint8_t use_defaults )
+void TC_init_defaults()
 {
    // TODO: Make this not reliant on assumed pinout
    TC_write( 0x401 );  // Sets reset in CR1
    TC_write( 0x400 );  // Clear reset in CR1
+}
 
-   if( !use_defaults )
-   {
-      TC_write( CSR0_Value );
-      TC_write( CSR1_Value );
-   }
+void TC_init( uint16_t CSR0, uint16_t CSR1 )
+{
+   TC_init_defaults();
+
+   TC_write( CSR0 );
+   TC_write( CSR1 );
 }
 
 void TC_write( uint16_t value )

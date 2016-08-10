@@ -20,7 +20,7 @@ int main(void)
    CO_wait_init();
    CO_wait_config();
 
-   TC_init( TC_ACCEPT_DEFAULTS );
+   TC_init_defaults();
 
    while(1)
    {
