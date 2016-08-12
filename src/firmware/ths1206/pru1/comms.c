@@ -113,6 +113,11 @@ void CO_wait_config()
    wait_for_req_handled( CC_REQ_CONFIG, CC_FIN_CONFIG );
 }
 
+void CO_wait_input_ready()
+{
+   wait_for_req_handled( CC_REQ_INPUT_READY, CC_FIN_INPUT_READY );
+}
+
 void CO_transfer_reads( void* buffer )
 {
    wait_for_req_handled( CC_REQ_CONSUMER, CC_FIN_CONSUMER );

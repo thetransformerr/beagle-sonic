@@ -12,6 +12,7 @@
 
 void CO_wait_init();
 void CO_wait_config();
+void CO_wait_input_ready();
 
 void CO_transfer_reads( void* buffer );
 

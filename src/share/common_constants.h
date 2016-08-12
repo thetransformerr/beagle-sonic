@@ -16,8 +16,11 @@
 #define CC_REQ_CONFIG      1
 #define CC_FIN_CONFIG      2
 
-#define CC_REQ_CONSUMER    3
-#define CC_FIN_CONSUMER    4
+#define CC_REQ_INPUT_READY 3
+#define CC_FIN_INPUT_READY 4
+
+#define CC_REQ_CONSUMER    5
+#define CC_FIN_CONSUMER    6
 
 
 #endif //COMMON_CONSTANTS_H_

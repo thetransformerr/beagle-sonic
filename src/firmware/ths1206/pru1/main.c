@@ -22,6 +22,8 @@ int main(void)
 
    TC_init_defaults();
 
+   CO_wait_input_ready();
+
    while(1)
    {
       TC_store_next_n_reads( CC_READS_PER_ROUND );
