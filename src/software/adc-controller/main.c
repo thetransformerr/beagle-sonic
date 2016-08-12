@@ -11,9 +11,11 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <unistd.h>
-//#include <string.h>
+#include <string.h>
 #include <fcntl.h>
 #include <sys/poll.h>
+
+#include <zmq.h>
 
 #include "common_constants.h"
 
@@ -27,6 +29,9 @@
 #define MAX_BUFFER_SIZE          (BYTES_PER_READ * READS_PER_TX)
 
 #define CMD_BUFFER_SIZE          80
+
+// TODO: Take as argument
+#define ZMQ_HOST                "tcp://*:5555" 
 
 // TODO: Figure out how to share these values with the firmware...
 //       Firmware just cares about bits in R30/R31. Need some way to relate the two nicely
@@ -75,6 +80,10 @@ void set_pins_in()
 
 int main(void)
 {
+   void* context = zmq_ctx_new();
+   void* publisher = zmq_socket( context, ZMQ_PUB );
+   zmq_bind( publisher, ZMQ_HOST ); 
+
    printf( "ADC Driver starting\n" );
    uint8_t buffer[ MAX_BUFFER_SIZE ];
    uint16_t* reads = (uint16_t*)buffer;   // Assumes little-endian
@@ -116,8 +125,17 @@ int main(void)
             }
             break;
 
-         case CC_REQ_CONSUMER:
+         case CC_REQ_INPUT_READY:
+            printf( "Setting pins to gpio in\n" );
             set_pins_in();
+            msg = CC_FIN_INPUT_READY;
+            while( write( pollfds[0].fd, &msg, 1 ) < 0 )
+            {
+               printf( "Problem with fin_config send. Retrying...\n" );
+            }
+            break;
+
+         case CC_REQ_CONSUMER:
             msg = CC_FIN_CONSUMER;
             while( write( pollfds[0].fd, &msg, 1 ) < 0 )
             {
@@ -137,11 +155,17 @@ int main(void)
             // reads and buffer are aliased
             double tof = find_tof( reads );
             printf( "Time of flight: %f ns\n", tof );
+
+            char zmsg[80];
+            snprintf( zmsg, sizeof zmsg, "%f", tof );
+            zmq_send( publisher, zmsg, strlen(zmsg), 0 );
             break;
       }
    }
 
    close( pollfds[0].fd );
+   zmq_close( publisher );
+   zmq_ctx_destroy( context );
 
    return 0;
 }

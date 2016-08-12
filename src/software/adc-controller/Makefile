@@ -1,6 +1,7 @@
 CC=gcc
 CFLAGS = -O2 -Wall -Wextra -Werror
 INCLUDES=-I../../share
+LDLIBS=-lzmq
 SOURCES=$(wildcard *.c)
 OBJECTS=$(SOURCES:.c=.o)
 
@@ -16,7 +17,7 @@ POSTCOMPILE = mv -f $(DEPDIR)/$*.Td $(DEPDIR)/$*.d
 .PHONY: clean
 
 all: $(OBJECTS)
-	$(CC) $(CFLAGS) $(INCLUDES) -o $(OUTNAME) main.c
+	$(CC) $(CFLAGS) $(INCLUDES) $(LDLIBS) -o $(OUTNAME) main.c
 
 %.o : %.c
 %.o : %.c $(DEPDIR)/%.d
