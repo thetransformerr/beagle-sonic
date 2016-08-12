@@ -20,6 +20,8 @@ static uint8_t trigger_level = 1;
 
 void TC_init_defaults()
 {
+   trigger_level = 1;
+
    TC_write( TC_CSR1_BIT | TC_RESET_BIT );  // Sets reset in CR1
    TC_write( TC_CSR1_BIT );  // Clear reset in CR1
 }
