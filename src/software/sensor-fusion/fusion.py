@@ -54,6 +54,21 @@ def get_pressure():
    return BMP_sensor.read_pressure()
 
 
+# TODO: Take as input, or better yet get from configuration process
+#     If windspeed is assumed to be 0, distance can be calculated from tof
+axis_distance = 0.5
+
+def find_windspeed( rel_humidity, temp, pressure, tof ):
+   pulse_speed = axis_distance / tof
+   return pulse_speed - est_speed_of_sound( rel_humidity, temp, pressure )
+
+
+# TODO: fill in... and figure out how
+def est_speed_of_sound( rel_humidity, temp, pressure ):
+   return 322.0
+
+
+
 # TODO: Add more frequent updates (IE avoid having to wait on the DHT)
 # Most basic setup possible
 # Loop through and grab all sensor readings then analyze
@@ -67,5 +82,6 @@ while True:
    print( "Humidity:    " + str(rel_humidity) )
    print( "Temperature: " + str(temp) )
    print( "ToF:         " + str(tof) )
+   print( "Wind speed:  " + str(find_windspeed( rel_humidity, temp, pressure, tof )) )
 
    time.sleep(2) # Wait for DHT
