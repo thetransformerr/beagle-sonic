@@ -28,7 +28,7 @@ zmq_tof_subscriber.setsockopt( zmq.SUBSCRIBE, "" )  # Listen to all messages on 
 
 # TODO: Deal with the fact there are actually two axes
 def get_tof():
-   return float( zmq_tof_subscriber.recv() )
+   return float( zmq_tof_subscriber.recv() ) / 10**9  # Convert ns to s
 
 
 DHT_sensor = Adafruit_DHT.AM2302
