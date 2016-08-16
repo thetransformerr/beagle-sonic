@@ -78,8 +78,6 @@ def run():
       pressure = get_pressure()
       tof = get_tof()
 
-      # TODO: calculate wind speed
-
       print( "Humidity:    " + str(rel_humidity) )
       print( "Temperature: " + str(temp) )
       print( "ToF:         " + str(tof) )
