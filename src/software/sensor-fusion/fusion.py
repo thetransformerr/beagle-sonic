@@ -72,16 +72,22 @@ def est_speed_of_sound( rel_humidity, temp, pressure ):
 # TODO: Add more frequent updates (IE avoid having to wait on the DHT)
 # Most basic setup possible
 # Loop through and grab all sensor readings then analyze
-while True:
-   rel_humidity, temp = get_rel_humidity_temp()
-   pressure = get_pressure()
-   tof = get_tof()
+def run():
+   while True:
+      rel_humidity, temp = get_rel_humidity_temp()
+      pressure = get_pressure()
+      tof = get_tof()
 
-   # TODO: calculate wind speed
+      # TODO: calculate wind speed
 
-   print( "Humidity:    " + str(rel_humidity) )
-   print( "Temperature: " + str(temp) )
-   print( "ToF:         " + str(tof) )
-   print( "Wind speed:  " + str(find_windspeed( rel_humidity, temp, pressure, tof )) )
+      print( "Humidity:    " + str(rel_humidity) )
+      print( "Temperature: " + str(temp) )
+      print( "ToF:         " + str(tof) )
+      print( "Wind speed:  " + str(find_windspeed( rel_humidity, temp, pressure, tof )) )
 
-   time.sleep(2) # Wait for DHT
+      time.sleep(2) # Wait for DHT
+
+
+
+if __name__ == "__main__":
+   run()
