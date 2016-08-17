@@ -10,6 +10,7 @@
 #include <stdint.h>
 //#include "resource_table_1.h"  // Conflicts at link with #include in store_readings.c
 
+#include "pin_control.h"
 #include "comms.h"
 #include "ths1206_control.h"
 #include "store_readings.h"
@@ -26,6 +27,7 @@ int main(void)
 
    while(1)
    {
+      write_reg(34);    // Tells PRU0 we're ready.    TODO: Consider moving to comms
       TC_store_next_n_reads( CC_READS_PER_ROUND );
       CO_transfer_reads( SR_get_buffer() );
       SR_reset();
