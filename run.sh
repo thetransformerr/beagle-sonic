@@ -15,5 +15,9 @@ cp src/firmware/ths1206/pru1/gen/*.out /lib/firmware/am335x-pru1-fw ||
 echo "4a334000.pru0" > /sys/bus/platform/drivers/pru-rproc/bind
 echo "4a338000.pru1" > /sys/bus/platform/drivers/pru-rproc/bind
 
+# Wait for rpmsg driver to set up
+# TODO: maybe add a check that /dev/rpmsg_pru31 exists?
+sleep 0.5
+
 # Start up userspace adc driver
 ./src/software/adc-controller/adc-controller.out
