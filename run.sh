@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# TODO: Should probably stop the PRUs too
+trap 'kill $(jobs -pr)' SIGINT SIGTERM EXIT
+
 make
 
 # Shutdown both prus if running
@@ -20,4 +23,7 @@ echo "4a338000.pru1" > /sys/bus/platform/drivers/pru-rproc/bind
 sleep 0.5
 
 # Start up userspace adc driver
-./src/software/adc-controller/adc-controller.out
+./src/software/adc-controller/adc-controller.out >/dev/null &
+
+# Start up sensor fusion script
+./src/software/sensor-fusion/fusion.py
