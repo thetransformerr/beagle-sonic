@@ -13,7 +13,15 @@
 // The number of ADC reads per sonic tx
 #define CC_READS_PER_ROUND 2000
 
-#define CC_ADC_CAPTURE_DELAY_CYCLES 0
+// Delay from start of sonic tx until ADC capture starts
+// For now just use a zero-point around 343 m/s, assuming a distance of 0.5m
+//    0.5 m / 343 m/s / 5ns = 292000 cycles for total travel
+// TODO: Check to ensure it is calculated at compile time
+// TODO: Remove reliance on distance assumption
+// TODO: Determine if there is a better way to handle it
+   // Could try to do it dynamically, but that will require communication between ARM and PRU0
+   // It probably is more trouble than it's worth
+#define CC_ADC_CAPTURE_DELAY_CYCLES (292000 - (CC_READS_PER_ROUND / 2) )
 #define CC_ADC_CAPTURE_DELAY_NS     (CC_ADC_CAPTURE_DELAY_CYCLES * 5)
 
 // Sample rate - 6MSPS
