@@ -13,6 +13,14 @@
 // The number of ADC reads per sonic tx
 #define CC_READS_PER_ROUND 2000
 
+#define CC_ADC_CAPTURE_DELAY_CYCLES 0
+#define CC_ADC_CAPTURE_DELAY_NS     (CC_ADC_CAPTURE_DELAY_CYCLES * 5)
+
+// Sample rate - 6MSPS
+// (1/6,000,000) s / 5 ns / 2 = 16.67
+#define CC_ADC_CLOCK_HALF_PERIOD_CYCLES   17
+#define CC_ADC_BETWEEN_SAMPLES_NS         (CC_ADC_CLOCK_HALF_PERIOD_CYCLES * 2 * 5)
+
 #define CC_REQ_CONFIG      1
 #define CC_FIN_CONFIG      2
 

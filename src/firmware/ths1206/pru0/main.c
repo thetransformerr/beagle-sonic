@@ -16,9 +16,8 @@
 #include "pin_control.h"
 #include "common_constants.h"
 
-// 6MSPS
-// (1/6,000,000) s / 5 ns / 2 = 16.67
-#define DELAY_CYCLES 17
+
+#define CLOCK_DELAY_CYCLES    CC_ADC_CLOCK_HALF_PERIOD_CYCLES
 
 
 int main(void)
@@ -34,9 +33,9 @@ int main(void)
          // TODO: The delays are a little off. Should account for time to set and loop...
          //       unless the optimizer gets to it? Maybe find a way to ensure it's unrolled
          set_pin( PA_CONV_CLK_BIT );
-         __delay_cycles( DELAY_CYCLES );
+         __delay_cycles( CLOCK_DELAY_CYCLES );
          clear_pin( PA_CONV_CLK_BIT );
-         __delay_cycles( DELAY_CYCLES );
+         __delay_cycles( CLOCK_DELAY_CYCLES );
       }
    }
 

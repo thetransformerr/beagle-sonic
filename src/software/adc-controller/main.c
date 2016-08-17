@@ -19,9 +19,8 @@
 
 #include "common_constants.h"
 
-// TODO: Get these value from a shared source along with the firmware
-#define TIME_BETWEEN_READS_NS    166.7
-#define DELAY_TIME_NS            0
+#define TIME_BETWEEN_READS_NS    CC_ADC_BETWEEN_SAMPLES_NS
+#define DELAY_TIME_NS            CC_ADC_CAPTURE_DELAY_NS
 #define READS_PER_TX             CC_READS_PER_ROUND
 #define BYTES_PER_READ           2
 
