@@ -1,6 +1,7 @@
 // -*- mode: asm -*-
 /*
 Copyright 2015 Google Inc. All Rights Reserved.
+Changes Copyright (C) 2016 Visaoni
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -26,6 +27,8 @@ inputs 4..7 will be sampled by ADC channel 1.
 .entrypoint TOP
 
 #include "shared_header.h"
+// Not wonderful, apparently PASM doesn't like ..
+#include "share-symlink/common_constants.h"
 
 // How many cycles in the "on" pulse
 #define HIGH_COUNT   r20
@@ -38,9 +41,27 @@ inputs 4..7 will be sampled by ADC channel 1.
 #define LOW_COUNTER  r24
 #define LOW_START    r25
 
+#define CLOCK_COUNT   CC_READS_PER_ROUND
+#define CLOCK_COUNTER r26
+
+// Assumes a 20khz sonic
+// Should be even
+#define SONIC_DELAY_COUNT   5000
+#define SONIC_DELAY_COUNTER r27
+
+#define ADC_DELAY_COUNT     CC_ADC_CAPTURE_DELAY_CYCLES - SONIC_DELAY_COUNT
+#define ADC_DELAY_COUNTER   r28
+
 #define SHARED_RAM r29
 
 #define NOP add r0, r0, 0
+
+
+.macro mov32
+.mparam dst, src
+  mov dst.w0, src & 0xFFFF
+  mov dst.w2, src >> 16
+.endm
 
 TOP:
   // Enable OCP master ports in SYSCFG register
@@ -68,10 +89,34 @@ CYCLE_L_IS_ODD:
   mov HIGH_START, CYCLE_ODD_H
   QBBS CYCLE_H_IS_ODD, HIGH_COUNTER, 0
   mov HIGH_START, CYCLE_EVEN_H
-  QBA CYCLE_EVEN_H
 CYCLE_H_IS_ODD:
 
-  // Main loop starts here (or at CYCLE_EVEN_H if HIGH_COUNT is even)
+
+// Main loop starts here
+START_TX:
+  ldi SONIC_DELAY_COUNTER, SONIC_DELAY_COUNT
+  mov32 ADC_DELAY_COUNTER, ADC_DELAY_COUNT
+  ldi CLOCK_COUNTER, CLOCK_COUNT
+
+  // Clock delays delay first, then toggle pin, so account for that delay
+  // Use LOW_COUNT, as that toggles clock high
+  sub ADC_DELAY_COUNTER, ADC_DELAY_COUNTER, LOW_COUNT
+
+  // Sonic high
+  set r30, 6
+
+WAIT_SONIC:
+  sub SONIC_DELAY_COUNTER, SONIC_DELAY_COUNTER, 2
+  qble WAIT_SONIC, SONIC_DELAY_COUNTER, 1
+
+  // Sonic low
+  clr r30, 6
+
+WAIT_ADC:
+  sub ADC_DELAY_COUNTER, ADC_DELAY_COUNTER, 2
+  qble WAIT_ADC, ADC_DELAY_COUNTER, 1
+
+JMP LOW_START
 
 CYCLE_ODD_H:
   sub HIGH_COUNTER, HIGH_COUNTER, 1
@@ -79,7 +124,7 @@ CYCLE_EVEN_H:
   NOP
 WAIT_H:
   sub HIGH_COUNTER, HIGH_COUNTER, 2
-  qblt WAIT_H, HIGH_COUNTER, 4
+  qblt WAIT_H, HIGH_COUNTER, 6
 
   // Reset the count for the low half of the cycle
   mov LOW_COUNTER, LOW_COUNT
@@ -103,6 +148,9 @@ WAIT_L:
 
   // GPIO clock pin P9_31 goes high
   set r30, 0
+
+  sub CLOCK_COUNTER, CLOCK_COUNTER, 1
+  qble START_TX, CLOCK_COUNTER, 0
 
   // Start the cycle over, skipping CYCLE_ODD_H if the count is even
   JMP HIGH_START
