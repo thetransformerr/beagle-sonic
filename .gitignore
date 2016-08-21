@@ -6,3 +6,6 @@ gen/
 *.d
 *.o
 *.pyc
+*.bin
+*.dtbo
+prudaq_capture
