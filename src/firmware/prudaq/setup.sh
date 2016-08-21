@@ -40,7 +40,7 @@ if [[ ! -f $DEVICE_OVERLAY ]] ; then
   exit 2
 fi
 
-if echo prudaq > /sys/devices/bone_capemgr.9/slots ; then
+if echo prudaq > /sys/devices/platform/bone_capemgr/slots ; then
   echo 'Device overlay successfully loaded.'
 else
   echo
