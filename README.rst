@@ -12,7 +12,10 @@ The main branch now focuses on using the prudaq_ cape with custom firmware. As a
 cape it is much better suited to the BeagleBone than using a more DIY solution
 like the previous THS1206. However prudaq was announced fairly late in GSoC
 2016, so the THS1206 was the original focus. That code is still available under
-the ths1206 branch. However at this point it is still untested. 
+the ths1206 branch. However at this point it is still untested.
+
+Quickstart_
+----------
 
 Hardware
 --------
@@ -34,31 +37,6 @@ Requirements
 - uio_pruss
 - HDMI disabled
 
-Build
------
-::
-
-   # make
-
-Run
----
-Ideally run.sh would be used but it doesn't actually work. Suggestions or a pull
-request would be great. It displays some extremely odd behavior that I can't
-begin to explain.
-
-For now, use two shells. You may alter the -i parameter to match your setup.
-Give it the hookup number you used for the receiver on the PRUDAQ.
-
-Shell 1::
-
-   # cd /src/firmware/prudaq
-   # ./setup.sh
-   # ./prudaq_capture -f 6000000 -i 0 -q 4 | ./tof_analysis
-
-Shell 2::
-
-   # ./src/software/sensor-fusion/fusion.py
-
 Dependencies
 ------------
 - Adafruit_Python_DHT_
@@ -72,3 +50,4 @@ Dependencies
 .. _Adafruit_Python_BMP: https://github.com/adafruit/Adafruit_Python_BMP
 .. _ZeroMQ: http://zeromq.org/distro:debian
 .. _PyZMQ: https://github.com/zeromq/pyzmq
+.. _Quickstart: https://github.com/Visaoni/beagle-sonic-anemometer/wiki/Quickstart
