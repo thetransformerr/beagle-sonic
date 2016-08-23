@@ -8,17 +8,36 @@ The Beagle Sonic Anemometer is a Beaglebone project for the 2016 Google Summer
 of Code. The aim of this project is to create an open source anemometer using
 ultrasonic time of flight measurements.
 
+The main branch now focuses on using the prudaq_ cape with custom firmware. As a
+cape it is much better suited to the BeagleBone than using a more DIY solution
+like the previous THS1206. However prudaq was announced fairly late in GSoC
+2016, so the THS1206 was the original focus. That code is still available under
+the ths1206 branch. However at this point it is still untested. 
 
-Repo Structure
---------------
-src/
-   firmware/ths1206/
-      pru0 & pru1
-         Contains the firmware for both PRUs.
+Hardware
+--------
+- Beaglebone (intended for Green/Green Wireless, but should be little to no
+  trouble for Black)
+- PRUDAQ Cape
+- DHT22 or other DHT sensor compatible with Adafruit_Python_DHT_.
+- BMP180 or other BMP sensor compatible with Adafruit_Python_BMP_.
+- 20khz Sonic Transducers
 
-   include/ & lib/
-      RPMsg headers and library.
-      Taken directly from the pru-support-package v5.
-      Updated versions are available at
-      https://git.ti.com/pru-software-support-package.
-      Note: v5 uses interupt-based RPMsg, which requires a kernel >= 4.4.12-r31
+Requirements
+------------
+- uio_pruss
+- HDMI disabled
+
+Dependencies
+------------
+- Adafruit_Python_DHT_
+- Adafruit_Python_BMP_
+- ZeroMQ_
+- PyZMQ_
+
+
+.. _prudaq: https://github.com/google/prudaq/wiki
+.. _Adafruit_Python_DHT: https://github.com/adafruit/Adafruit_Python_DHT
+.. _Adafruit_Python_BMP: https://github.com/adafruit/Adafruit_Python_BMP
+.. _ZeroMQ: http://zeromq.org/distro:debian
+.. _PyZMQ: https://github.com/zeromq/pyzmq
