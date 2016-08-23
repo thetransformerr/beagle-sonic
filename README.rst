@@ -47,6 +47,7 @@ request would be great. It displays some extremely odd behavior that I can't
 begin to explain.
 
 For now, use two shells. You may alter the -i parameter to match your setup.
+Give it the hookup number you used for the receiver on the PRUDAQ.
 
 Shell 1::
 
