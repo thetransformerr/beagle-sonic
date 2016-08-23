@@ -63,7 +63,7 @@ permissions and limitations under the License.
          "P8.39", "P8.40", "P8.41", "P8.42", "P8.43", "P8.44", "P8.45", "P8.46",
          "P9.26",
          // And these will be configured as outputs from PRU0
-         "P9.25", "P9.27", "P9.28", "P9.29", "P9.30", "P9.31", "P9.41";
+         "P9.25", "P9.27", "P9.28", "P9.29", "P9.30", "P9.31", "P9.42";
 
    fragment@0 {
       target = <&am33xx_pinmux>;
@@ -103,7 +103,7 @@ permissions and limitations under the License.
                0x194 0x05  // P9.29
                0x198 0x05  // P9.30
                0x190 0x05  // P9.31
-               0x1A8 0x05  // P9.41
+               0x1A0 0x05  // P9.41
 
                // Requirement for enabling P9.41
                0x1B4 0x20  // CLKOUT2 to input
