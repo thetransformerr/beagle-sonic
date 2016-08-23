@@ -9,3 +9,4 @@ gen/
 *.bin
 *.dtbo
 prudaq_capture
+tof_analysis
