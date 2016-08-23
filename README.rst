@@ -36,7 +36,9 @@ Requirements
 
 Build
 -----
-# make
+::
+
+   # make
 
 Run
 ---
@@ -46,13 +48,15 @@ begin to explain.
 
 For now, use two shells. You may alter the -i parameter to match your setup.
 
-Shell 1
-# cd ./src/firmware/prudaq
-# ./setup.sh
-# ./prudaq_capture -f 6000000 -i 0 -q 4 | ./tof_analysis
+Shell 1::
 
-Shell 2
-# ./src/software/sensor-fusion/fusion.py
+   # cd /src/firmware/prudaq
+   # ./setup.sh
+   # ./prudaq_capture -f 6000000 -i 0 -q 4 | ./tof_analysis
+
+Shell 2::
+
+   # ./src/software/sensor-fusion/fusion.py
 
 Dependencies
 ------------
