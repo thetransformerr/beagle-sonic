@@ -23,10 +23,36 @@ Hardware
 - BMP180 or other BMP sensor compatible with Adafruit_Python_BMP_.
 - 20khz Sonic Transducers
 
+Setup
+-----
+- Attach PRUDAQ cape
+- Attach receiver to a channel 0 hookup (0 - 3) on the PRUDAQ
+- Attach the transmitter to P8.42
+
 Requirements
 ------------
 - uio_pruss
 - HDMI disabled
+
+Build
+-----
+# make
+
+Run
+---
+Ideally run.sh would be used but it doesn't actually work. Suggestions or a pull
+request would be great. It displays some extremely odd behavior that I can't
+begin to explain.
+
+For now, use two shells. You may alter the -i parameter to match your setup.
+
+Shell 1
+# cd ./src/firmware/prudaq
+# ./setup.sh
+# ./prudaq_capture -f 6000000 -i 0 -q 4 | ./tof_analysis
+
+Shell 2
+# ./src/software/sensor-fusion/fusion.py
 
 Dependencies
 ------------
