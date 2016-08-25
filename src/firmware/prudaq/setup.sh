@@ -57,11 +57,10 @@ modprobe uio_pruss extram_pool_sz=2097152
 
 # Instead do it with universal overlays and config-pin
 # Grabs the needed pins under a universal overlay so config-pin can touch them
-# Overlays must precede pins
+# Assumes needed universal overlay is loaded. If not, config-pin can do it.
+# If doing so, add the overlay before the pin configs.
 
 configlist=(
-"overlay univ-all"
-
 "P8.27 pruin"
 "P8.28 pruin"
 "P8.29 pruin"
