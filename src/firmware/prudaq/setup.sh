@@ -28,7 +28,11 @@ fi
 #
 # For high sample rates and much larger buffers, consider using
 # BeagleLogic's prudaq support instead.
-modprobe uio_pruss extram_pool_sz=2097152
+
+# This would be nicer than requiring a modprobe.d/*.conf setting, but it doesn't
+# work, so, just add the below (prefixed with "options ") to
+# /etc/modprobe.d/uio_pruss.conf
+# modprobe uio_pruss extram_pool_sz=2097152
 
 
 # Overlays are the proper way, but currently there are some major issues with it
