@@ -8,6 +8,8 @@ The Beagle Sonic Anemometer is a Beaglebone project for the 2016 Google Summer
 of Code. The aim of this project is to create an open source anemometer using
 ultrasonic time of flight measurements.
 
+`Final Report`_
+
 The main branch now focuses on using the prudaq_ cape with custom firmware. As a
 cape it is much better suited to the BeagleBone than using a more DIY solution
 like the previous THS1206. However prudaq was announced fairly late in GSoC
@@ -19,7 +21,7 @@ Quickstart_
 
 Hardware
 --------
-- Beaglebone (intended for Green/Green Wireless, but should be little to no
+- Beaglebone (intended for Green, but should be little to no
   trouble for Black)
 - PRUDAQ Cape
 - DHT22 or other DHT sensor compatible with Adafruit_Python_DHT_.
@@ -51,3 +53,4 @@ Dependencies
 .. _ZeroMQ: http://zeromq.org/distro:debian
 .. _PyZMQ: https://github.com/zeromq/pyzmq
 .. _Quickstart: https://github.com/Visaoni/beagle-sonic-anemometer/wiki/Quickstart
+.. _`Final Report`: https://groups.google.com/d/msg/beagleboard-gsoc/CMmqEzv77bQ/g5OLpv1CBQAJ
