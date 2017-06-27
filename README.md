@@ -1,3 +1,6 @@
+In this method I have planned to use pru for driving prudaq and PWM for wave generation, I have imported dts for prudaq and for pwm, dts already exist in bb which I have uploaded here again.
+
+
 # Beagle-Sonic Anemometer
 GSoC-2017: Create a sonic anemometer using BeagleBoard Black for 2-dimension wind measurement.
 
