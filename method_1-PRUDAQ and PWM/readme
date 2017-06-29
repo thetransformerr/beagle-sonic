@@ -1,6 +1,6 @@
 Before using this code, we have to set up some requirements that are listed below:
 
-1).you'll have to disable HDMI to free up some pins needed by PRUDAQ.SSH in and carefully edit /boot/uboot/uEnv.txt as root to uncomment this line, then reboot:
+1).You'll have to disable HDMI to free up some pins needed by PRUDAQ.SSH in and carefully edit /boot/uboot/uEnv.txt as root to uncomment this line, then reboot:
 
 cape_disable=capemgr.disable_partno=BB-BONELT-HDMI,BB-BONELT-HDMIN
 
@@ -19,13 +19,9 @@ here $SLOTS=/sys/devices/bone_capemgr.9/slots
 since this address doesnt work for me, I have BBBWL-SC-562 with default distribution that was shipped)
 
 root@beaglebone:/lib/firmware# sudo sh -c "echo bone_pwm_P9_42 > $SLOTS"
-
 root@beaglebone:/lib/firmware# sudo sh -c "echo am33xx_pwm > $SLOTS"
-
 root@beaglebone:/lib/firmware# cat $SLOTS
-
  0: 54:PF---
-
  1: 55:PF---
  2: 56:PF---
  3: 57:PF---
@@ -55,7 +51,9 @@ lrwxrwxrwx  1 root root    0 Feb  3 00:28 subsystem -> ../../../bus/platform
 
 
 
-2.)Then build and install the code:(execute this code in present where all project files are present, i.e. in this directory "beagle-sonic/method_1-PRUDAQ and PWM" )
+2.)Then build and install the code:
+(execute this code in present where all project files are present, i.e. in this directory "beagle-sonic/method_1-PRUDAQ and PWM" )
+
 debian@beaglebone$ make
 debian@beaglebone$ sudo make install  # This just copies the .dtbo file to /lib/firmware
 debian@beaglebone$ sudo reboot        # Reboot just to be safe, so it notices the .dtbo
