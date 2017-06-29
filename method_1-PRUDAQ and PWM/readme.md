@@ -1,6 +1,3 @@
-An example to use the PWM class on a PWM pin -- See pages 232-233 in the book 
-Exploring BeagleBone by Derek Molloy
-
 Before using this code, we have to set up some requirements that are listed below:
 
 1).you'll have to disable HDMI to free up some pins needed by PRUDAQ.SSH in and carefully edit /boot/uboot/uEnv.txt as root to uncomment this line, then reboot:
@@ -15,13 +12,20 @@ P9_42 has been exported using the following steps:
 
 (took pwm pin idea from here: https://github.com/derekmolloy/exploringBB/tree/master/chp06/pwm , pages 232-233 in the book 
 Exploring BeagleBone by Derek Molloy)
+
 here $SLOTS=/sys/devices/bone_capemgr.9/slots 
+
 (please check if this is the address in your BBB distribution, because either I am missing something or it has changed 
 since this address doesnt work for me, I have BBBWL-SC-562 with default distribution that was shipped)
+
 root@beaglebone:/lib/firmware# sudo sh -c "echo bone_pwm_P9_42 > $SLOTS"
+
 root@beaglebone:/lib/firmware# sudo sh -c "echo am33xx_pwm > $SLOTS"
+
 root@beaglebone:/lib/firmware# cat $SLOTS
+
  0: 54:PF---
+
  1: 55:PF---
  2: 56:PF---
  3: 57:PF---
