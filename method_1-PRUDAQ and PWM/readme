@@ -1,3 +1,19 @@
+$ sudo ./prudaq_capture 
+
+   Usage: prudaq_capture [flags] pru0_code.bin pru1_code.bin
+
+    -f freq	 gpio based clock frequency (default: 1000)
+    -i [0-3]	 channel 0 input select
+    -q [4-7]	 channel 1 input select
+    -o output	 output filename (default: stdout)
+    
+   for ex. To set up sampling rate of 400kHz and set input channel as 0 and 4
+   
+    sudo ./prudaq_capture -i 0 -q 4 -f 400000 pru0.bin pru1.bin | hexdump -d -v | head
+
+
+
+
 Before using this code, we have to set up some requirements that are listed below:
 
 1).You'll have to disable HDMI to free up some pins needed by PRUDAQ.SSH in and carefully edit /boot/uboot/uEnv.txt 
@@ -62,4 +78,8 @@ Before using this code, we have to set up some requirements that are listed belo
   [ Wait for reboot then ssh in again ]
   debian@beaglebone$ cd ~/prudaq/src
   debian@beaglebone$ sudo ./setup.sh    # Init script that needs to be run once every time
+  
+  Running make builds the prudaq_capture example program and assembles the firmware for the two realtime units. 
+  prudaq_capture enables the ADC, loads the firmware into the PRUs, then reads binary sample data 
+  from the shared buffer and writes it to stdout.
 
