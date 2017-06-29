@@ -1,63 +1,64 @@
 Before using this code, we have to set up some requirements that are listed below:
 
-1).You'll have to disable HDMI to free up some pins needed by PRUDAQ.SSH in and carefully edit /boot/uboot/uEnv.txt as root to uncomment this line, then reboot:
+1).You'll have to disable HDMI to free up some pins needed by PRUDAQ.SSH in and carefully edit /boot/uboot/uEnv.txt as root
+   to uncomment this line, then reboot:
 
-cape_disable=capemgr.disable_partno=BB-BONELT-HDMI,BB-BONELT-HDMIN
+   cape_disable=capemgr.disable_partno=BB-BONELT-HDMI,BB-BONELT-HDMIN
 
-If you don't see /boot/uboot/uEnv.txt, you may have to mount /dev/mmcblk0p1 somewhere first. (There are lots of guides online talking about disabling BeagleBone HDMI).
+   If you don't see /boot/uboot/uEnv.txt, you may have to mount /dev/mmcblk0p1 somewhere first. (There are lots of guides online
+   talking about disabling BeagleBone HDMI).
 
-2).we MUST load the overlay for the PWM pin that we 
-are using. For example, the current code example code assumes that the pin
-P9_42 has been exported using the following steps:
+2).we MUST load the overlay for the PWM pin that we are using. For example, the current code example code assumes that the pin
+   P9_42 has been exported using the following steps:
 
-(took pwm pin idea from here: https://github.com/derekmolloy/exploringBB/tree/master/chp06/pwm , pages 232-233 in the book 
-Exploring BeagleBone by Derek Molloy)
+  (took pwm pin idea from here: https://github.com/derekmolloy/exploringBB/tree/master/chp06/pwm , pages 232-233 in the book 
+  Exploring BeagleBone by Derek Molloy)
 
-here $SLOTS=/sys/devices/bone_capemgr.9/slots 
+  here $SLOTS=/sys/devices/bone_capemgr.9/slots 
 
-(please check if this is the address in your BBB distribution, because either I am missing something or it has changed 
-since this address doesnt work for me, I have BBBWL-SC-562 with default distribution that was shipped)
+  (please check if this is the address in your BBB distribution, because either I am missing something or it has changed 
+  since this address doesnt work for me, I have BBBWL-SC-562 with default distribution that was shipped)
 
-root@beaglebone:/lib/firmware# sudo sh -c "echo bone_pwm_P9_42 > $SLOTS"
-root@beaglebone:/lib/firmware# sudo sh -c "echo am33xx_pwm > $SLOTS"
-root@beaglebone:/lib/firmware# cat $SLOTS
- 0: 54:PF---
- 1: 55:PF---
- 2: 56:PF---
- 3: 57:PF---
- 4: ff:P-O-L Bone-LT-eMMC-2G,00A0,Texas Instrument,BB-BONE-EMMC-2G
- 5: ff:P-O-- Bone-Black-HDMI,00A0,Texas Instrument,BB-BONELT-HDMI
- 6: ff:P-O-- Bone-Black-HDMIN,00A0,Texas Instrument,BB-BONELT-HDMIN
- 7: ff:P-O-L Override Board Name,00A0,Override Manuf,EBB-PRU-Example
- 8: ff:P-O-L Override Board Name,00A0,Override Manuf,bone_pwm_P9_42
- 9: ff:P-O-L Override Board Name,00A0,Override Manuf,am33xx_pwm
+  root@beaglebone:/lib/firmware# sudo sh -c "echo bone_pwm_P9_42 > $SLOTS"
+  root@beaglebone:/lib/firmware# sudo sh -c "echo am33xx_pwm > $SLOTS"
+  root@beaglebone:/lib/firmware# cat $SLOTS
+  0: 54:PF---
+  1: 55:PF---
+  2: 56:PF---
+  3: 57:PF---
+  4: ff:P-O-L Bone-LT-eMMC-2G,00A0,Texas Instrument,BB-BONE-EMMC-2G
+  5: ff:P-O-- Bone-Black-HDMI,00A0,Texas Instrument,BB-BONELT-HDMI
+  6: ff:P-O-- Bone-Black-HDMIN,00A0,Texas Instrument,BB-BONELT-HDMIN
+  7: ff:P-O-L Override Board Name,00A0,Override Manuf,EBB-PRU-Example
+  8: ff:P-O-L Override Board Name,00A0,Override Manuf,bone_pwm_P9_42
+  9: ff:P-O-L Override Board Name,00A0,Override Manuf,am33xx_pwm
 
-//verify if its is done =>
-root@beaglebone:/sys/devices/ocp.3# cd pwm_test_P9_42.13/
-root@beaglebone:/sys/devices/ocp.3/pwm_test_P9_42.13# ls -al
-total 0
-drwxr-xr-x  3 root root    0 Feb  3 00:28 .
-drwxr-xr-x 37 root root    0 May 23  2014 ..
-lrwxrwxrwx  1 root root    0 Feb  3 00:30 driver -> ../../../bus/platform/drivers/pwm_test
--rw-------  1 root root 4096 Feb  3 00:30 duty
--r--r--r--  1 root root 4096 Feb  3 00:30 modalias
--rw-------  1 root root 4096 Feb  3 00:30 period
--rw-------  1 root root 4096 Feb  3 00:30 polarity
-drwxr-xr-x  2 root root    0 Feb  3 00:30 power
--rw-------  1 root root 4096 Feb  3 00:30 run
-lrwxrwxrwx  1 root root    0 Feb  3 00:28 subsystem -> ../../../bus/platform
--rw-r--r--  1 root root 4096 Feb  3 00:28 uevent
+  //verify if its is done =>
+  root@beaglebone:/sys/devices/ocp.3# cd pwm_test_P9_42.13/
+  root@beaglebone:/sys/devices/ocp.3/pwm_test_P9_42.13# ls -al
+  total 0
+  drwxr-xr-x  3 root root    0 Feb  3 00:28 .
+  drwxr-xr-x 37 root root    0 May 23  2014 ..
+  lrwxrwxrwx  1 root root    0 Feb  3 00:30 driver -> ../../../bus/platform/drivers/pwm_test
+  -rw-------  1 root root 4096 Feb  3 00:30 duty
+  -r--r--r--  1 root root 4096 Feb  3 00:30 modalias
+  -rw-------  1 root root 4096 Feb  3 00:30 period
+  -rw-------  1 root root 4096 Feb  3 00:30 polarity
+  drwxr-xr-x  2 root root    0 Feb  3 00:30 power
+  -rw-------  1 root root 4096 Feb  3 00:30 run
+  lrwxrwxrwx  1 root root    0 Feb  3 00:28 subsystem -> ../../../bus/platform
+  -rw-r--r--  1 root root 4096 Feb  3 00:28 uevent
 
 
 
 
 2.)Then build and install the code:
-(execute this code in present where all project files are present, i.e. in this directory "beagle-sonic/method_1-PRUDAQ and PWM" )
+  (execute this code in present where all project files are present, i.e. in this directory "beagle-sonic/method_1-PRUDAQ and PWM" )
 
-debian@beaglebone$ make
-debian@beaglebone$ sudo make install  # This just copies the .dtbo file to /lib/firmware
-debian@beaglebone$ sudo reboot        # Reboot just to be safe, so it notices the .dtbo
-[ Wait for reboot then ssh in again ]
-debian@beaglebone$ cd ~/prudaq/src
-debian@beaglebone$ sudo ./setup.sh    # Init script that needs to be run once every time
+  debian@beaglebone$ make
+  debian@beaglebone$ sudo make install  # This just copies the .dtbo file to /lib/firmware
+  debian@beaglebone$ sudo reboot        # Reboot just to be safe, so it notices the .dtbo
+  [ Wait for reboot then ssh in again ]
+  debian@beaglebone$ cd ~/prudaq/src
+  debian@beaglebone$ sudo ./setup.sh    # Init script that needs to be run once every time
 
