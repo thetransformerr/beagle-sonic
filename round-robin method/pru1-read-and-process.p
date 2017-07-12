@@ -48,6 +48,8 @@ permissions and limitations under the License.
 #define INPUT1_AMPLITUDE r13.w2
 #define INPUT4_AMPLITUDE r14.w0
 #define INPUT5_AMPLITUDE r14.w2
+#define INPUT2_AMPLITUDE r23.w0
+#define INPUT6_AMPLITUDE r23.w2 
 
 // Registers for storing the max and min values on each channel
 #define INPUT0_REG r15
@@ -62,6 +64,12 @@ permissions and limitations under the License.
 #define INPUT5_REG r18
 #define INPUT5_MAX INPUT5_REG.w2
 #define INPUT5_MIN INPUT5_REG.w0
+#define INPUT2_REG r24
+#define INPUT2_MAX INPUT5_REG.w2
+#define INPUT2_MIN INPUT5_REG.w0
+#define INPUT6_REG r25
+#define INPUT6_MAX INPUT5_REG.w2
+#define INPUT6_MIN INPUT5_REG.w0
 
 #define RING_POINTER r19
 #define RING_END r20
@@ -96,11 +104,14 @@ TOP:
   mov RING_POINTER, DDR
   add RING_END, DDR, DDR_SIZE
 
-  /* We will preserve the 10 data bits and bit 10 which tells us which input is
+  /* We will preserve the 10 data bits and bit 10 and 11  tells us which input is
      selected by the analog switch right now (which will be different from
-     the input selected 3 cycles ago when the sample entered the ADC's
-     internal pipeline. (This gets ANDed with the sample below). */
-  mov MASK_REG, 0x000007ff
+     the input selected 3 cycles ago when the sample entered the ADCs
+     internal pipeline. (This gets ANDed with the sample below). 
+  */
+
+
+  mov MASK_REG, 0x00000fff
 
 // Loop over the shared ring buffer
 MAIN_LOOP:
@@ -113,9 +124,11 @@ MAIN_LOOP:
   mov INPUT1_REG, 0x0000ffff
   mov INPUT4_REG, 0x0000ffff
   mov INPUT5_REG, 0x0000ffff
+  mov INPUT2_REG, 0x0000ffff
+  mov INPUT6_REG, 0x0000ffff
 
-  /* Because each time through the loop does either inputs 1 and 4, or 2 and 5,
-     we need to go through 2n times for 1, 2, 4, and 5 for each to be
+  /* Because each time through the loop does either inputs 0 and 4, or 1 and 5, or 2 and 6,
+     we need to go through 2n times for 0,1, 2, 4,5 and 6 for each to be
      considered n times */
   mov AMPLITUDE_SAMPLES, AMPLITUDE_SAMPLE_COUNT * 2
 AMPLITUDE_LOOP:
@@ -124,7 +137,7 @@ AMPLITUDE_LOOP:
   // There are 8 or 9 cycles starting with this wbs and ending at the wbc.
   wbs r31, 11
   /*
-   * The clock is high, and it'll be about 11ns before the data is valid.
+   * The clock is high, and it will be about 11ns before the data is valid.
    * Additionally, PRU0 will be switching the mux in about 10ns.  Waiting
    * 15ns here leaves time for both of those things to happen. */
   nop
@@ -132,9 +145,12 @@ AMPLITUDE_LOOP:
   nop
   // Read and mask GPIO in the same op
   and SAMPLE_REG, r31, MASK_REG
-  /* If bit 10 (one of the selector lines for the analog switch) is set,
-   * the sample we just read corresponds with input 1 */
+  //Quick Branch if Bit is Set (QBBS)=>Jumps 
+  //if the bit OP(31) is set in REG1:QBBS LABEL, REG1, OP(31)
+  //If bit 10 (one of the selector lines for the analog switch) is set,
+  // the sample we just read corresponds with input 1 
   qbbs CHANNEL0_SECOND_INPUT, SAMPLE_REG, 10
+  qbbs CHANNEL0_THIRD_INPUT , SAMPLE_REG, 11
 CHANNEL0_FIRST_INPUT:
   max INPUT0_MAX, INPUT0_MAX, SAMPLE_REG
   min INPUT0_MIN, INPUT0_MIN, SAMPLE_REG
@@ -142,6 +158,9 @@ CHANNEL0_FIRST_INPUT:
 CHANNEL0_SECOND_INPUT:
   max INPUT1_MAX, INPUT1_MAX, SAMPLE_REG
   min INPUT1_MIN, INPUT1_MIN, SAMPLE_REG
+CHANNEL0_THIRD_INPUT:
+  max INPUT2_MAX, INPUT2_MAX, SAMPLE_REG
+  min INPUT2_MIN, INPUT2_MIN, SAMPLE_REG
 CHANNEL0_MINMAX_DONE:
 
 
@@ -154,7 +173,8 @@ CHANNEL0_MINMAX_DONE:
   nop
   nop
   and SAMPLE_REG, r31, MASK_REG
-  qbbs CHANNEL1_SECOND_INPUT, SAMPLE_REG, 10
+  qbbs CHANNEL1_SECOND_INPUT, SAMPLE_REG, 10 
+  qbbs CHANNEL1_THIRD_INPUT , SAMPLE_REG, 11
 CHANNEL1_FIRST_INPUT:
   max INPUT4_MAX, INPUT4_MAX, SAMPLE_REG
   min INPUT4_MIN, INPUT4_MIN, SAMPLE_REG
@@ -162,25 +182,30 @@ CHANNEL1_FIRST_INPUT:
 CHANNEL1_SECOND_INPUT:
   max INPUT5_MAX, INPUT5_MAX, SAMPLE_REG
   min INPUT5_MIN, INPUT5_MIN, SAMPLE_REG
+CHANNEL1_THIRD_INPUT:
+  max INPUT6_MAX, INPUT6_MAX, SAMPLE_REG
+  min INPUT6_MIN, INPUT6_MIN, SAMPLE_REG
 CHANNEL1_MINMAX_DONE:
 
   sub AMPLITUDE_SAMPLES, AMPLITUDE_SAMPLES, 1
   qbne AMPLITUDE_LOOP, AMPLITUDE_SAMPLES, 0
 
-  /* Okay, we've found the min and max values over AMPLITUDE_SAMPLE_COUNT
+  /* Okay, we have found the min and max values over AMPLITUDE_SAMPLE_COUNT
      samples.  Now we write to shared RAM and start over again. */
 
   sub INPUT0_AMPLITUDE, INPUT0_MAX, INPUT0_MIN
   sub INPUT1_AMPLITUDE, INPUT1_MAX, INPUT1_MIN
+  sub INPUT2_AMPLITUDE, INPUT2_MAX, INPUT2_MIN
   sub INPUT4_AMPLITUDE, INPUT4_MAX, INPUT4_MIN
   sub INPUT5_AMPLITUDE, INPUT5_MAX, INPUT5_MIN
+  sub INPUT6_AMPLITUDE, INPUT6_MAX, INPUT6_MIN
 
   // 3 cycles, or more in the case of bus collision
   sbbo AMPLITUDES_START, RING_POINTER, 0, AMPLITUDES_LEN
 
   add RING_POINTER, RING_POINTER, AMPLITUDES_LEN
 
-  /* If it isn't time to roll over the ring buffer, keep looping */
+  /* If it is not time to roll over the ring buffer, keep looping */
   qblt MAIN_LOOP, RING_END, RING_POINTER
 
   /* Else reset to the beginning of the ring and then loop */
