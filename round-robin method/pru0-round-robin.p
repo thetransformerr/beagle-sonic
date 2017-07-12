@@ -1,4 +1,19 @@
 // -*- mode: asm -*-
+/*
+Copyright 2015 Google Inc. All Rights Reserved.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+   http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
+implied.  See the License for the specific language governing
+permissions and limitations under the License.
+*/
 
 /* This code runs on PRU0.  It generates a GPIO clock while alternating
  * the analog switches between inputs 0 and 4, and inputs 1 and 5.
@@ -52,31 +67,25 @@ TOP:
   /*
   We need to switch channels on the analog muxes before we sample,
   and the MAX4734 datasheet says that takes 25ns.
+
   The AD9201 has 4ns aperture delay.  So we have to wait that long after
   the rising clock edge before we switch.
+
   The input RC filter (10 ohms + 100pF) has a corner at 160MHz, so a bit
   less than 10ns.  So we should wait at least that long after switching
   so that the filter has had time to respond.  Also, there's almost
   200pF of capacitance inside the MAX4734.
+
   So we want to switch at least 35ns before we sample, and after we sample
   we shouldnt switch for 4ns.  So one or two PRU clock cycles after the
   rising ADC clock edge, we should be fine to switch, and that maximizes
   the time we have to switch and overcome capacitance before the next
   rising edge.
+
   Register 30:
   Bit 0: clock
   Bit 5 and 3: channel 0 input select
   Bit 1 and 2: channel 1 input select
-
-  ----------------
-  Bit 5 and 3 => 00 -->input 0(receiver axis x)
-                 01 -->input 1(receiver axis y)
-                 10 -->input 2(temp sensor 1)
-  Bit 1 and 2 => 00 -->input 4(transmitter axis x)
-                 01 -->input 5(transmitter axis y)
-                 10 -->input 6(temp sensor 2)
-  -----------------
-
   */
 
   // Clock low, input 0
@@ -112,31 +121,11 @@ REPEAT:
   NOP
   NOP
 
-  // Switch muxes to inputs 2 and 6 now that 1 and 5 have been sampled
-  mov r30, (1 << 2) | (1 << 4) | 0x01
-
-  // This pause plus the next half ADC clock cycle should be plenty for the amux
-  // switching time and for the input filters to adjust
-  PAUSE HALF_CYCLE_COUNT - 4
-
-  // Clock goes low (channel 1 soon becomes available on readout pins)
-  mov r30, (1 << 2) | (1 << 4) | 0x0
-
-  // Twiddle our thumbs during the low part of the cycle
-  PAUSE HALF_CYCLE_COUNT - 1
-
-  // Clock goes high, sampling inputs 2 and 6.
-  mov r30, (1 << 2) | (1 << 4) | 0x1
-
-  // Wait 10ns
-  NOP
-  NOP
-
   // Clock stays high as we switch muxes back to inputs 0 and 4
   mov r30, 0x1
 
   PAUSE HALF_CYCLE_COUNT - 4
-  
+
   // Clock goes low, input 5 
   mov r30, 0x0
 
