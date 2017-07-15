@@ -1,0 +1,12 @@
+Debug/
+Release/
+.xdchelp
+gen/
+*.out
+*.d
+*.o
+*.pyc
+*.bin
+*.dtbo
+prudaq_capture
+tof_analysis
