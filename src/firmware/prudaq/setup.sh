@@ -19,45 +19,11 @@ if [[ $EUID -ne 0 ]]; then
   exit 1
 fi
 
-# Set the shared memory buffer length to 2MB.
-# Default size is 256KB, which at high sample rates will fill up
-# in only a few ms, making buffer overruns more likely when the
-# host CPU gets busy.
-# Max value is 4194304, but under some conditions uio_pruss
-# has trouble allocating that much contiguous RAM and may fail.
-#
-# For high sample rates and much larger buffers, consider using
-# BeagleLogic's prudaq support instead.
 
-# This would be nicer than requiring a modprobe.d/*.conf setting, but it doesn't
-# work, so, just add the below (prefixed with "options ") to
-# /etc/modprobe.d/uio_pruss.conf
-# modprobe uio_pruss extram_pool_sz=2097152
 
 
 # Overlays are the proper way, but currently there are some major issues with it
 # Namely it doesn't actually configure the pins
-
-# DEVICE_OVERLAY=/lib/firmware/prudaq-00A0.dtbo
-# if [[ ! -f $DEVICE_OVERLAY ]] ; then
-#   echo -n "$DEVICE_OVERLAY not found, so we can't enable it."
-#   echo -n " (Did you run 'make install' to generate the .dtbo"
-#   echo -n " file from the .dts and copy it to /lib/firmware?)"
-#   echo
-#   echo
-#   exit 2
-# fi
-
-# if echo prudaq > /sys/devices/platform/bone_capemgr/slots ; then
-#   echo 'Device overlay successfully loaded.'
-# else
-#   echo
-#   echo -n "Couldn't enable the prudaq-00A0.dtbo device overlay."
-#   echo -n " (If the error was 'File exists', then the overlay was already"
-#   echo -n " enabled.)"
-#   echo
-#   exit 3
-# fi
 
 # Instead do it with universal overlays and config-pin
 # Grabs the needed pins under a universal overlay so config-pin can touch them
@@ -79,7 +45,8 @@ configlist=(
 "P8.46 pruin"
 "P9.26 pruin"
 
-"P9.25 pruout"
+
+"P9.25 pwm"
 "P9.27 pruout"
 "P9.28 pruout"
 "P9.29 pruout"
