@@ -1,7 +1,7 @@
-.PHONY: all clean
+.PHONY: tof clean
 
-all:
-	cd src/firmware/prudaq && $(MAKE)
+tof:
+	$(MAKE) -C pru-tof_method/firmware/prudaq
 
 clean:
-	cd src/firmware/prudaq && $(MAKE) clean
+	$(MAKE) -C pru-tof_method/firmware/prudaq clean
