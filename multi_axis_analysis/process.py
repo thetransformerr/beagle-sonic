@@ -64,7 +64,13 @@ axis_distance = 0.15
 def find_windspeed( temp,tof ):
    pulse_speed = axis_distance / tof
    temp += 273.15    # Celsius to Kelvin
-   return 20.05*math.sqrt( temp )
+   sound_speed=20.05*math.sqrt( temp )
+   speed=pulse_speed-sound_speed
+   if (speed > 0):
+      direction="from tx to rx"
+   else:
+      direction="from rx to tx"
+   return speed,direction
 
 def run():
    while True:
@@ -72,12 +78,12 @@ def run():
       samples_y_rx_sensor,samples_y_tx_sensor,samples_x_rx_sensor,samples_x_tx_sensor=get_samples()
       tof_x = get_tof(samples_x_tx_sensor,samples_x_rx_sensor)
       tof_y=get_tof(samples_y_tx_sensor,samples_y_rx_sensor)
-      windspeed_x=find_windspeed(tof_x,temp)
-      windspeed_y=find_windspeed(tof_y,temp)
+      windspeed_x,direction_x=find_windspeed(tof_x,temp)
+      windspeed_y,direction_y=find_windspeed(tof_y,temp)
       print( "Temperature: " + str(temp) )
       print( "ToF_x: " + str(tof_x)+" tof_y: "+str(tof_y) )
-      print( "Wind speed=> x: " + str(windspeed_x)+" y: "+str(windspeed_y))
-      time.sleep(2) 
+      print( "Wind speed=> x: " + str(windspeed_x)+" direction_x: "+direction_x+" y: "+str(windspeed_y)+" direction_y: "+direction_y)
+      time.sleep(2)
 
 
 

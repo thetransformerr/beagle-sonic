@@ -22,6 +22,7 @@ configlist=(
 "P8.28 pruin"
 "P8.29 pruin"
 "P8.30 pruin"
+
 "P8.39 pruin"
 "P8.40 pruin"
 "P8.41 pruin"
@@ -30,16 +31,17 @@ configlist=(
 "P8.44 pruin"
 "P8.45 pruin"
 "P8.46 pruin"
+
 "P9.26 pruin"
 
-
-"P9.25 pwm"
+#output pins
+"P9.25 pruout"
 "P9.27 pruout"
 "P9.28 pruout"
 "P9.29 pruout"
 "P9.30 pruout"
 "P9.31 pruout"
-"P9.92 pruout"    # See note
+"P9.92 pwm"    # See note
 )
 
 # Note: P9.42 is referred to as P9.92 above.
