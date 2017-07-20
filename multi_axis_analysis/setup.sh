@@ -41,15 +41,14 @@ configlist=(
 "P9.29 pruout"
 "P9.30 pruout"
 "P9.31 pruout"
-"P9.92 pwm"    # See note
+"P9.22 pwm"
 )
 
-# Note: P9.42 is referred to as P9.92 above.
-# The physical pin is shared by two processor pins. Add 50 to specify P9.42.1
 
 for args in "${configlist[@]}"
 do
   config-pin $args
+  echo 0 > /sys/devices/platform/ocp/48300000.epwmss/48300200.pwm/pwm/pwmchip0/export || true
 done
 
 exit 0

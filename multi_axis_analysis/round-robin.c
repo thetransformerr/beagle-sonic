@@ -1,4 +1,4 @@
-/*
+/*
 Copyright 2015 Google Inc. All Rights Reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License");
@@ -33,75 +33,79 @@ static int bCont = 1;
 #include "shared_header.h"
 
 // the PRU clock speed used for GPIO clock generation
+
 #define PRU_CLK 200e6
+
+
+
 //--------set freq in pwm module------
 void set_freq(float freq_hz){
-    FILE *fp;
-    fp=fopen("/sys/devices/ocp.3/pwm_test_P9_42.12/period","w+");
-    if (fp == NULL){
-        perror("GPIO: write failed to open file ");
-        return;
-    }
-    float period_s = 1.0f/freq_hz;
-    unsigned int period_ns=(unsigned int)period_s*1000000000;
-    fprintf(fp,"%u",period_ns);
-    fclose(fp);
-    return;
+   FILE *fp;
+   fp=fopen("/sys/devices/platform/ocp/48300000.epwmss/48300200.pwm/pwm/pwmchip0/pwm0/period","w+");
+   if (fp == NULL){
+     perror("GPIO: write failed to open file ");
+     return;
+   }
+   float period_s = 1.0f/freq_hz;
+   unsigned int period_ns=(unsigned int)period_s*1000000000;
+   fprintf(fp,"%u",period_ns);
+   fclose(fp);
+   return;
 }
 //------set duty cycle in nanoseconds,should not be greater than period----
 void set_DutyCycle(unsigned int duty_ns){
-    FILE *fp;
-    fp=fopen("/sys/devices/ocp.3/pwm_test_P9_42.12/duty","w+");
-    if (fp == NULL){
-        perror("GPIO: write failed to open file ");
-        return;
-    }
-    fprintf(fp,"%u",duty_ns);
-    fclose(fp);
-    return;
+   FILE *fp;
+   fp=fopen("/sys/devices/platform/ocp/48300000.epwmss/48300200.pwm/pwm/pwmchip0/pwm0/duty","w+");
+   if (fp == NULL){
+     perror("GPIO: write failed to open file ");
+     return;
+   }
+   fprintf(fp,"%u",duty_ns);
+   fclose(fp);
+   return;
 }
 //works only when freq is 40kHz
 void set_DutyCycle_40(float percentage){
-    FILE *fp;
-    fp=fopen("/sys/devices/ocp.3/pwm_test_P9_42.12/duty","w+");
-    if (fp == NULL){
-        perror("GPIO: write failed to open file ");
-        return;
-    }
-    if ((percentage>100.0f)||(percentage<0.0f)){
-        perror("enter value between 0 to 100");
-        return;
-    }
-    float duty=25000*(percentage/100.0f);
-    unsigned int duty_ns=(unsigned int)duty;
-    fprintf(fp,"%u",duty_ns);
-    fclose(fp);
-    return;
+   FILE *fp;
+   fp=fopen("/sys/devices/platform/ocp/48300000.epwmss/48300200.pwm/pwm/pwmchip0/pwm0/duty","w+");
+   if (fp == NULL){
+     perror("GPIO: write failed to open file ");
+     return;
+   }
+   if ((percentage>100.0f)||(percentage<0.0f)){
+     perror("enter value between 0 to 100");
+     return;
+   }
+   float duty=25000*(percentage/100.0f);
+   unsigned int duty_ns=(unsigned int)duty;
+   fprintf(fp,"%u",duty_ns);
+   fclose(fp);
+   return;
 }
 
 void pwm_enable(){
-    FILE *fp;
-    fp=fopen("/sys/devices/ocp.3/pwm_test_P9_42.12/run","w+");
-    if (fp == NULL){
-        perror("GPIO: write failed to open file ");
-        return;
-    }
-    fprintf(fp,"%d",1);
-    fclose(fp);
-    return;
-    
+  FILE *fp;
+   fp=fopen("/sys/devices/platform/ocp/48300000.epwmss/48300200.pwm/pwm/pwmchip0/pwm0/enable","w+");
+   if (fp == NULL){
+     perror("GPIO: write failed to open file ");
+     return;
+   }
+  fprintf(fp,"%d",1);
+  fclose(fp);
+  return;
+
 }
 void pwm_disable(){
-    FILE *fp;
-    fp=fopen("/sys/devices/ocp.3/pwm_test_P9_42.12/run","w+");
-    if (fp == NULL){
-        perror("GPIO: write failed to open file ");
-        return -1;
-    }
-    fprintf(fp,"%d",0);
-    fclose(fp);
-    return;
-    
+  FILE *fp;
+   fp=fopen("/sys/devices/platform/ocp/48300000.epwmss/48300200.pwm/pwm/pwmchip0/pwm0/enable","w+");
+   if (fp == NULL){
+     perror("GPIO: write failed to open file ");
+     return -1;
+   }
+  fprintf(fp,"%d",0);
+  fclose(fp);
+  return;
+
 }
 
 void sig_handler (int sig) {

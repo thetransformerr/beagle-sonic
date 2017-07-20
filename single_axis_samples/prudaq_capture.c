@@ -26,10 +26,11 @@ buffer in main memory.
 #include <inttypes.h>
 #include <libgen.h>
 #include <string.h>
-
+#include <fcntl.h>
 #include <prussdrv.h>
 #include <pruss_intc_mapping.h>
-
+#include <zmq.h>
+#include <sys/poll.h>
 #include <signal.h>
 #include <time.h>
 
@@ -43,7 +44,9 @@ static int bCont = 1;
 // The PRUs run at 200MHz
 #define PRU_CLK 200e6
 
-//--------set freq in pwm module------
+#define ZMQ_HOST                "tcp://*:5555" 
+
+//Set freq in pwm module
 void set_freq(float freq_hz){
    FILE *fp;
    fp=fopen("/sys/devices/platform/ocp/48300000.epwmss/48300200.pwm/pwm/pwmchip0/pwm0/period","w+");
@@ -140,6 +143,9 @@ int main (int argc, char **argv) {
   int channel1_input = 4;
   char* fname = "-";
   FILE* fout = stdout;
+  void* context = zmq_ctx_new();
+  void* publisher = zmq_socket( context, ZMQ_PUB );
+  zmq_bind( publisher, ZMQ_HOST );
 
   // Make sure we're root
   if (geteuid() != 0) {
@@ -332,6 +338,7 @@ int main (int argc, char **argv) {
       }
 
       fwrite(local_buf, bytes, 1, fout);
+      zmq_send( publisher, local_buf, bytes, 0 );
 
     } else {
       // The write pointer has wrapped around, so we'll copy out the data
@@ -355,6 +362,8 @@ int main (int argc, char **argv) {
       }
 
       fwrite(local_buf, tail_bytes + head_bytes, 1, fout);
+      zmq_send( publisher, local_buf, tail_bytes + head_bytes , 0 );
+      
     }
     read_index = write_index;
 
