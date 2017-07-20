@@ -42,10 +42,11 @@ static int bCont = 1;
 
 // The PRUs run at 200MHz
 #define PRU_CLK 200e6
+
 //--------set freq in pwm module------
 void set_freq(float freq_hz){
    FILE *fp;
-   fp=fopen("/sys/devices/ocp.3/pwm_test_P9_42.12/period","w+");
+   fp=fopen("/sys/devices/platform/ocp/48300000.epwmss/48300200.pwm/pwm/pwmchip0/pwm0/period","w+");
    if (fp == NULL){
      perror("GPIO: write failed to open file ");
      return;
@@ -59,7 +60,7 @@ void set_freq(float freq_hz){
 //------set duty cycle in nanoseconds,should not be greater than period----
 void set_DutyCycle(unsigned int duty_ns){
    FILE *fp;
-   fp=fopen("/sys/devices/ocp.3/pwm_test_P9_42.12/duty","w+");
+   fp=fopen("/sys/devices/platform/ocp/48300000.epwmss/48300200.pwm/pwm/pwmchip0/pwm0/duty","w+");
    if (fp == NULL){
      perror("GPIO: write failed to open file ");
      return;
@@ -71,7 +72,7 @@ void set_DutyCycle(unsigned int duty_ns){
 //works only when freq is 40kHz
 void set_DutyCycle_40(float percentage){
    FILE *fp;
-   fp=fopen("/sys/devices/ocp.3/pwm_test_P9_42.12/duty","w+");
+   fp=fopen("/sys/devices/platform/ocp/48300000.epwmss/48300200.pwm/pwm/pwmchip0/pwm0/duty","w+");
    if (fp == NULL){
      perror("GPIO: write failed to open file ");
      return;
@@ -89,7 +90,7 @@ void set_DutyCycle_40(float percentage){
 
 void pwm_enable(){
   FILE *fp;
-   fp=fopen("/sys/devices/ocp.3/pwm_test_P9_42.12/run","w+");
+   fp=fopen("/sys/devices/platform/ocp/48300000.epwmss/48300200.pwm/pwm/pwmchip0/pwm0/enable","w+");
    if (fp == NULL){
      perror("GPIO: write failed to open file ");
      return;
@@ -101,7 +102,7 @@ void pwm_enable(){
 }
 void pwm_disable(){
   FILE *fp;
-   fp=fopen("/sys/devices/ocp.3/pwm_test_P9_42.12/run","w+");
+   fp=fopen("/sys/devices/platform/ocp/48300000.epwmss/48300200.pwm/pwm/pwmchip0/pwm0/enable","w+");
    if (fp == NULL){
      perror("GPIO: write failed to open file ");
      return -1;
@@ -383,7 +384,7 @@ int main (int argc, char **argv) {
       fprintf(stderr, "disabling PWM module");
       pwm_disable();
       usleep(100);
-      fprintf(stderr, "disabling PWM module");
+      fprintf(stderr, "enabling PWM module");
       pwm_enable();
     }
     usleep(100);
