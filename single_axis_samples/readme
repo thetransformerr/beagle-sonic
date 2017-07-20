@@ -1,3 +1,5 @@
+This is yet to be updated again.
+
 $ sudo ./prudaq_capture 
 
    Usage: prudaq_capture [flags] pru0_code.bin pru1_code.bin
