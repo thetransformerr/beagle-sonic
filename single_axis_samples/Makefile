@@ -24,7 +24,7 @@ install: prudaq-00A0.dtbo
 	$(PASM) -b $^
 
 prudaq_capture: prudaq_capture.o
-	$(CC) -o $@ $^ -l prussdrv
+	$(CC) -o $@ $^ -lprussdrv -L/usr/local/lib -lzmq
 
 %.dtbo: %.dts
 	$(DTC) -I dts -b0 -O dtb -@ -o $@ $^

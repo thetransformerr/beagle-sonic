@@ -44,11 +44,11 @@ configlist=(
 "P9.22 pwm"
 )
 
-
+modprobe uio_pruss extram_pool_sz=2097152
 for args in "${configlist[@]}"
 do
   config-pin $args
-  echo 0 > /sys/devices/platform/ocp/48300000.epwmss/48300200.pwm/pwm/pwmchip0/export || true
+  echo 0 > /sys/devices/platform/ocp/48300000.epwmss/48300200.ehrpwm/pwm/pwmchip0/export || true
 done
 
 exit 0
