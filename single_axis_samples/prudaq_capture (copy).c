@@ -26,10 +26,10 @@ buffer in main memory.
 #include <inttypes.h>
 #include <libgen.h>
 #include <string.h>
-#include <fcntl.h>
+
 #include <prussdrv.h>
 #include <pruss_intc_mapping.h>
-#include <zmq.h>
+
 #include <sys/poll.h>
 #include <signal.h>
 #include <time.h>
@@ -44,15 +44,14 @@ static int bCont = 1;
 // The PRUs run at 200MHz
 #define PRU_CLK 200e6
 
-#define ZMQ_HOST                "tcp://*:5555"
 
 
 //Set freq in pwm module
 void set_freq(float freq_hz){
    FILE *fp;
-   fp=fopen("/sys/devices/platform/ocp/48300000.epwmss/48300200.ehrpwm/pwm/pwmchip0/pwm0/period","w+");
+   fp=fopen("/sys/devices/platform/ocp/48300000.epwmss/48300200.pwm/pwm/pwmchip0/pwm0/period","w+");
    if (fp == NULL){
-     perror("GPIO: write failed to open file set-freq");
+     perror("GPIO: write failed to open file ");
      return;
    }
    float period_s = 1.0f/freq_hz;
@@ -64,9 +63,9 @@ void set_freq(float freq_hz){
 //------set duty cycle in nanoseconds,should not be greater than period----
 void set_DutyCycle(unsigned int duty_ns){
    FILE *fp;
-   fp=fopen("/sys/devices/platform/ocp/48300000.epwmss/48300200.ehrpwm/pwm/pwmchip0/pwm0/duty","w+");
+   fp=fopen("/sys/devices/platform/ocp/48300000.epwmss/48300200.pwm/pwm/pwmchip0/pwm0/duty","w+");
    if (fp == NULL){
-     perror("GPIO: write failed to open file set_duty");
+     perror("GPIO: write failed to open file ");
      return;
    }
    fprintf(fp,"%u",duty_ns);
@@ -76,9 +75,9 @@ void set_DutyCycle(unsigned int duty_ns){
 //works only when freq is 40kHz
 void set_DutyCycle_40(float percentage){
    FILE *fp;
-   fp=fopen("/sys/devices/platform/ocp/48300000.epwmss/48300200.ehrpwm/pwm/pwmchip0/pwm0/duty","w+");
+   fp=fopen("/sys/devices/platform/ocp/48300000.epwmss/48300200.pwm/pwm/pwmchip0/pwm0/duty","w+");
    if (fp == NULL){
-     perror("GPIO: write failed to open file  freq");
+     perror("GPIO: write failed to open file ");
      return;
    }
    if ((percentage>100.0f)||(percentage<0.0f)){
@@ -94,9 +93,9 @@ void set_DutyCycle_40(float percentage){
 
 void pwm_enable(){
   FILE *fp;
-   fp=fopen("/sys/devices/platform/ocp/48300000.epwmss/48300200.ehrpwm/pwm/pwmchip0/pwm0/enable","w+");
+   fp=fopen("/sys/devices/platform/ocp/48300000.epwmss/48300200.pwm/pwm/pwmchip0/pwm0/enable","w+");
    if (fp == NULL){
-     perror("GPIO: write failed to open file enable pwm");
+     perror("GPIO: write failed to open file ");
      return;
    }
   fprintf(fp,"%d",1);
@@ -106,10 +105,10 @@ void pwm_enable(){
 }
 void pwm_disable(){
   FILE *fp;
-   fp=fopen("/sys/devices/platform/ocp/48300000.epwmss/48300200.ehrpwm/pwm/pwmchip0/pwm0/enable","w+");
+   fp=fopen("/sys/devices/platform/ocp/48300000.epwmss/48300200.pwm/pwm/pwmchip0/pwm0/enable","w+");
    if (fp == NULL){
-     perror("GPIO: write failed to open file disable pwm ");
-     return;
+     perror("GPIO: write failed to open file ");
+     return -1;
    }
   fprintf(fp,"%d",0);
   fclose(fp);
@@ -144,9 +143,6 @@ int main (int argc, char **argv) {
   int channel1_input = 4;
   char* fname = "-";
   FILE* fout = stdout;
-  void *context = zmq_ctx_new ();
-  void* publisher = zmq_socket( context, ZMQ_PUB );
-  zmq_bind( publisher, ZMQ_HOST );
 
   // Make sure we're root
   if (geteuid() != 0) {
@@ -340,7 +336,7 @@ int main (int argc, char **argv) {
       }
 
       fwrite(local_buf, bytes, 1, fout);
-      zmq_send( publisher, local_buf, bytes, 0 );
+     // zmq_send( publisher, local_buf, bytes, 0 );
 
     } else {
       // The write pointer has wrapped around, so we'll copy out the data
@@ -364,7 +360,7 @@ int main (int argc, char **argv) {
       }
 
       fwrite(local_buf, tail_bytes + head_bytes, 1, fout);
-      zmq_send( publisher, local_buf, tail_bytes + head_bytes , 0 );
+      //zmq_send( publisher, local_buf, tail_bytes + head_bytes , 0 );
       
     }
     read_index = write_index;
@@ -392,12 +388,11 @@ int main (int argc, char **argv) {
     //of only one frequency, therefore to separate samples, we disable pwm and then enable again 
     //after every 4000 samples  
     if (((bytes_read/4)%2000)==0 ){
-      bytes_read_temp=bytes_read + 80;
-      fprintf(stderr, "enabling PWM module  %u %u",bytes_read, bytes_read_temp );
+      bytes_read_temp=bytes_read;
+      fprintf(stderr, "enabling PWM module");
       pwm_enable();}
-    
-    if(bytes_read>=bytes_read_temp ){
-      fprintf(stderr, "disabling PWM module \n");
+    if((bytes_read_temp+80)==bytes_read ){
+      fprintf(stderr, "disabling PWM module");
       pwm_disable();}
     usleep(100);
   }
