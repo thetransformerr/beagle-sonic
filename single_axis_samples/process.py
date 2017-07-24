@@ -46,7 +46,7 @@ def get_tof(sam_TX,sam_RX):
    tof=np.argmax(correlate_np)-(len(normalised_tx)/2)
    return tof
 
-def temp():
+def get_temp():
    temp=25
    return temp # to implement working for sampling analog values from sensor like lm-35
 
@@ -69,13 +69,13 @@ def find_windspeed( temp,tof ):
 
 def run():
    while True:
-      temp = get_temp
+      temp = get_temp()
       samples_x_rx_sensor,samples_x_tx_sensor=get_samples()
       tof_x = get_tof(samples_x_tx_sensor,samples_x_rx_sensor)
       windspeed_x,direction_x=find_windspeed(tof_x,temp)
       print( "Temperature: " + str(temp) )
       print( "ToF_x: " + str(tof_x))
-      print( "Wind speed=> x: " + str(windspeed_x)+" direction: "+direction_x))
+      print( "Wind speed=> x: " + str(windspeed_x)+" direction: "+str(direction_x))
       time.sleep(2) 
 
 
