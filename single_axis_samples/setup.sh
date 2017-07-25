@@ -48,7 +48,18 @@ modprobe uio_pruss extram_pool_sz=2097152
 for args in "${configlist[@]}"
 do
   config-pin $args
-  echo 0 > /sys/devices/platform/ocp/48300000.epwmss/48300200.ehrpwm/pwm/pwmchip0/export || true
 done
+
+if [[ -e /sys/devices/platform/ocp/48300000.epwmss/48300200.ehrpwm ]]; then
+  # bone kernel 4.4.x
+  echo 0 > /sys/devices/platform/ocp/48300000.epwmss/48300200.ehrpwm/pwm/pwmchip0/export || true
+elif [[ -e /sys/devices/platform/ocp/48300000.epwmss/48300200.pwm ]]; then
+  # bone kernel 4.9.x
+  echo 0 > /sys/devices/platform/ocp/48300000.epwmss/48300200.pwm/pwm/pwmchip0/export || true
+else
+  # no pwm support
+  echo "Can't find PWM device!"
+  exit 1
+fi
 
 exit 0
