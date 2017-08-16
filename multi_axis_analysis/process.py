@@ -29,17 +29,27 @@ def get_samples(): #collect abt 1000 samples for each channel for rate at 200k s
    samples_x_rx_sensor=[]
    samples_y_tx_sensor=[]
    samples_y_rx_sensor=[]
-   while(samples_count <4400):
-      s=samples_count%4
-      if(s==0):
-         samples_x_tx_sensor.append(zmq_sample_subscriber.recv())
-      elif(s==1):
-         samples_x_rx_sensor.append(zmq_sample_subscriber.recv())
-      elif(s==2):
-         samples_y_tx_sensor.append(zmq_sample_subscriber.recv())
-      elif(s==3):
-         samples_y_rx_sensor.append(zmq_sample_subscriber.recv())
-      samples_count=samples_count+1
+   temp=0
+   while(samples_count <10000):
+      temp=zmq_sample_subscriber.recv()
+      temp=temp[1:]
+      temp=hx.dump(temp1,size=4,sep=' ')
+      temp=temp.split()
+      print len(temp)
+      for i in temp:
+         s=samples_count%4
+         if(s==0):
+            samples_x_rx_sensor.append(int(i,16))
+         elif(s==1):
+            samples_x_rx_sensor.append(int(i,16))
+         elif(s==2):
+            samples_y_tx_sensor.append(int(i,16))
+         elif(s==3):
+            samples_y_rx_sensor.append(int(i,16))
+         if samples_count<=10000:
+            samples_count=samples_count+1
+         else:
+            break
    return samples_y_rx_sensor,samples_y_tx_sensor,samples_x_rx_sensor,samples_x_tx_sensor
 
 
@@ -62,7 +72,10 @@ axis_distance = 0.15
 
 #Based on https://en.wikipedia.org/wiki/Speed_of_sound#Practical_formula_for_dry_air
 def find_windspeed( temp,tof ):
-   pulse_speed = axis_distance / tof
+   if (tof!=0):
+      pulse_speed=float(axis_distance/tof)
+   else: 
+      pulse_speed = 336
    temp += 273.15    # Celsius to Kelvin
    sound_speed=20.05*math.sqrt( temp )
    speed=pulse_speed-sound_speed
@@ -78,8 +91,8 @@ def run():
       samples_y_rx_sensor,samples_y_tx_sensor,samples_x_rx_sensor,samples_x_tx_sensor=get_samples()
       tof_x = get_tof(samples_x_tx_sensor,samples_x_rx_sensor)
       tof_y=get_tof(samples_y_tx_sensor,samples_y_rx_sensor)
-      windspeed_x,direction_x=find_windspeed(tof_x,temp)
-      windspeed_y,direction_y=find_windspeed(tof_y,temp)
+      windspeed_x,direction_x=find_windspeed(temp,tof_x)
+      windspeed_y,direction_y=find_windspeed(temp,tof_y)
       print( "Temperature: " + str(temp) )
       print( "ToF_x: " + str(tof_x)+" tof_y: "+str(tof_y) )
       print( "Wind speed=> x: " + str(windspeed_x)+" direction_x: "+direction_x+" y: "+str(windspeed_y)+" direction_y: "+direction_y)

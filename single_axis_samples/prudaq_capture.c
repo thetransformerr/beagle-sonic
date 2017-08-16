@@ -314,6 +314,7 @@ int main (int argc, char **argv) {
   uint32_t bytes_read_temp = 0;
   int loops = 0;
   while (bCont) {
+      
     // Reading from shared memory and PRU RAM is significantly slower than normal
     // memory, so we loop below rather than checking shared_ptr every time, and
     // we only check bytes_written once in a while.
@@ -393,7 +394,7 @@ int main (int argc, char **argv) {
     //waveforms of tx and rx starts to match since waveform is periodic and consists
     //of only one frequency, therefore to separate samples, we disable pwm and then enable again 
     //after every 4000 samples  
-    if (((bytes_read/4)%2000)==0 ){
+    if (((bytes_read/4)%4000)==0 ){
       bytes_read_temp=bytes_read + 80;
      // fprintf(stderr, "enabling PWM module  %u %u",bytes_read, bytes_read_temp );
       pwm_enable();}

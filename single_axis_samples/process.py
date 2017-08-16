@@ -14,9 +14,6 @@ import numpy as np
 import hexdump as hx
 # TODO: Take port as input
 zmq_tof_host = "tcp://localhost:5555"
-
-out1=open('out','w')
-out2=open('out1','w')
 zmq_context = zmq.Context()
 zmq_sample_subscriber = zmq_context.socket( zmq.SUB )
 zmq_sample_subscriber.setsockopt( zmq.CONFLATE, 1 )           # Keeps only latest message
@@ -30,11 +27,10 @@ def get_samples(): #collect abt 1000 samples for each channel for rate at 200k s
    samples_x_rx_sensor=[]
    temp1=0
    temp2=0
-   while(samples_count <2500):
+   while(samples_count <5000):
       temp1=zmq_sample_subscriber.recv()
       temp1=temp1[1:]
       temp1=hx.dump(temp1,size=4,sep=' ')
-      out1.write(temp1)
       temp1=temp1.split()
       print len(temp1)
       for i in temp1:
@@ -46,7 +42,7 @@ def get_samples(): #collect abt 1000 samples for each channel for rate at 200k s
             samples_x_rx_sensor.append(int(i,16))
             #print int(i,16)
             samples_count=samples_count+1
-         if samples_count==2500:
+         if samples_count==5000:
             break
       #print samples_count
       #print samples_x_rx_sensor,samples_x_tx_sensor

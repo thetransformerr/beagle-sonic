@@ -185,9 +185,7 @@ int main (int argc, char **argv) {
       memcpy(amplitudes, (void *) read_pointer, 8);
 
       for (int i = 0; i < 6; i++) {
-        // Insert code here for doing interesting things with the downsampled
-        // amplitude data.
-        foo += amplitudes[i];
+        zmq_send( publisher, amplitudes[i], bytes, 0 );
         bytes_read += sizeof(amplitudes[0]);
       }
       // Occasionally report to stderr
