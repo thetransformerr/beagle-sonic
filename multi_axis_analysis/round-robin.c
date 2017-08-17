@@ -185,6 +185,7 @@ int main (int argc, char **argv) {
       memcpy(amplitudes, (void *) read_pointer, 8);
 
       for (int i = 0; i < 6; i++) {
+        
         zmq_send( publisher, amplitudes[i], bytes, 0 );
         bytes_read += sizeof(amplitudes[0]);
       }
