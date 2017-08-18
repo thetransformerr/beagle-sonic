@@ -217,12 +217,6 @@ int main (int argc, char **argv) {
   //run pwm
   pwm_enable();
 
-
-
-
-
-
-
   // This segfaults if we're not root.
   prussdrv_init();
   if (0 != prussdrv_open(PRU_EVTOUT_0)) {
@@ -318,9 +312,9 @@ int main (int argc, char **argv) {
     printf("sleeping for 2 seconds\n");
     sleep(2000);
     pwm_enable();
-    usleep(400);
+    usleep(250);
     pwm_disable();
-    usleep(400);
+    usleep(1000);
     
     // Reading from shared memory and PRU RAM is significantly slower than normal
     // memory, so we loop below rather than checking shared_ptr every time, and
@@ -349,7 +343,7 @@ int main (int argc, char **argv) {
         local_buf[i] &= 0x03ff03ff;
       }
 
-      fwrite(local_buf, bytes, 1, fout);
+      //fwrite(local_buf, bytes, 1, fout);
       zmq_send( publisher, local_buf, bytes, 0 );
 
     } else {
@@ -373,7 +367,7 @@ int main (int argc, char **argv) {
         local_buf[tail_words + i] &= 0x03ff03ff;
       }
 
-      fwrite(local_buf, tail_bytes + head_bytes, 1, fout);
+     // fwrite(local_buf, tail_bytes + head_bytes, 1, fout);
       zmq_send( publisher, local_buf, tail_bytes + head_bytes , 0 );
       
     }
@@ -397,18 +391,7 @@ int main (int argc, char **argv) {
                 bytes_written / (now - start_time), bytes_written, bytes_read);
       }
     }
-    //since pwm module is always running, there may be condition after some time that 
-    //waveforms of tx and rx starts to match since waveform is periodic and consists
-    //of only one frequency, therefore to separate samples, we disable pwm and then enable again 
-    //after every 4000 samples  
-    if (loops%4000 == 0){
-      fprintf(stderr, "disabling PWM module");
-      pwm_disable();
-      usleep(100);
-      fprintf(stderr, "enabling PWM module");
-      pwm_enable();
-    }
-    usleep(100);
+ 
   }
 
   // Wait for the PRU to let us know it's done

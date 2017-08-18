@@ -27,12 +27,13 @@ def get_samples(): #collect abt 1000 samples for each channel for rate at 200k s
    samples_x_rx_sensor=[]
    temp1=0
    temp2=0
-   while(samples_count <5000):
+   while(samples_count <800):
       temp1=zmq_sample_subscriber.recv()
       temp1=temp1[1:]
       temp1=hx.dump(temp1,size=4,sep=' ')
       temp1=temp1.split()
       print len(temp1)
+      temp1=temp1[len(temp1)-800:]
       for i in temp1:
          s=samples_count%2
          if(s==0):
@@ -42,7 +43,7 @@ def get_samples(): #collect abt 1000 samples for each channel for rate at 200k s
             samples_x_rx_sensor.append(int(i,16))
             #print int(i,16)
             samples_count=samples_count+1
-         if samples_count==5000:
+         if samples_count==800:
             break
       #print samples_count
       #print samples_x_rx_sensor,samples_x_tx_sensor
