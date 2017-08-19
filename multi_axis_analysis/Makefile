@@ -21,4 +21,4 @@ clean:
 	$(PASM) -b $^
 
 round-robin: round-robin.o
-	$(CC) -o $@ $^ -l prussdrv
+	$(CC) -o $@ $^ -l prussdrv -L/usr/local/lib -lzmq

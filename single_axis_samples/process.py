@@ -13,13 +13,18 @@ import time
 import numpy as np
 import hexdump as hx
 # TODO: Take port as input
-zmq_tof_host = "tcp://localhost:5555"
-zmq_context = zmq.Context()
-zmq_sample_subscriber = zmq_context.socket( zmq.SUB )
-zmq_sample_subscriber.setsockopt( zmq.CONFLATE, 1 )           # Keeps only latest message
-zmq_sample_subscriber.connect( zmq_tof_host )
-zmq_sample_subscriber.setsockopt( zmq.SUBSCRIBE, "" )  # Listen to all messages on socket
-
+zmq_CH1 = "tcp://localhost:5555"
+zmq_CH2 = "tcp://localhost:5556"
+zmq_context_ch1 = zmq.Context()
+zmq_context_ch2=zmq.Context()
+zmq_sample_subscriber_ch1 = zmq_context_ch1.socket( zmq.SUB )
+zmq_sample_subscriber_ch2 = zmq_context_ch2.socket( zmq.SUB )
+zmq_sample_subscriber_ch2.setsockopt( zmq.CONFLATE, 1 )
+zmq_sample_subscriber_ch1.setsockopt( zmq.CONFLATE, 1 )          # Keeps only latest message
+zmq_sample_subscriber_ch2.connect( zmq_CH2 )
+zmq_sample_subscriber_ch1.connect( zmq_CH1 )
+zmq_sample_subscriber_ch1.setsockopt( zmq.SUBSCRIBE, "" )
+zmq_sample_subscriber_ch2.setsockopt( zmq.SUBSCRIBE, "" )  # Listen to all messages on socket
 def get_samples(): #collect abt 1000 samples for each channel for rate at 200k samples and 
                    #axis distance of 15 cm
    samples_count=0
@@ -28,25 +33,13 @@ def get_samples(): #collect abt 1000 samples for each channel for rate at 200k s
    temp1=0
    temp2=0
    while(samples_count <800):
-      temp1=zmq_sample_subscriber.recv()
-      temp1=temp1[1:]
-      temp1=hx.dump(temp1,size=4,sep=' ')
-      temp1=temp1.split()
-      print len(temp1)
-      temp1=temp1[len(temp1)-800:]
-      for i in temp1:
-         s=samples_count%2
-         if(s==0):
-            samples_x_tx_sensor.append(int(i,16))
-            samples_count=samples_count+1
-         elif(s==1):
-            samples_x_rx_sensor.append(int(i,16))
-            #print int(i,16)
-            samples_count=samples_count+1
-         if samples_count==800:
-            break
-      #print samples_count
-      #print samples_x_rx_sensor,samples_x_tx_sensor
+      temp1=zmq_sample_subscriber_ch1.recv()
+      samples_x_tx_sensor.append(int(temp1,16))
+      temp2=zmq_sample_subscriber_ch2.recv()
+      samples_x_rx_sensor.append(int(temp2,16))
+      samples_count=samples_count+1
+      print samples_count
+      #print samples_x_rx_sensor[samples_count],samples_x_tx_sensor[samples_count]
    return samples_x_rx_sensor,samples_x_tx_sensor
 
 

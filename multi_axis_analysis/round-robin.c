@@ -13,37 +13,38 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
 implied.  See the License for the specific language governing
 permissions and limitations under the License.
 */
-
 #include <unistd.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <inttypes.h>
 #include <libgen.h>
 #include <string.h>
-
+#include <fcntl.h>
 #include <prussdrv.h>
 #include <pruss_intc_mapping.h>
-
+#include <zmq.h>
+#include <sys/poll.h>
+#include <signal.h>
+#include <time.h>
+// Header for sharing info between PRUs and application processor
+#include "shared_header.h"
 #include <signal.h>
 
 static int bCont = 1;
-
-
-// header for sharing info between PRUs and application processor
-#include "shared_header.h"
+#define ZMQ_HOST_ch0    "tcp://*:5555" 
+#define ZMQ_HOST_ch4    "tcp://*:5556"
+#define ZMQ_HOST_ch1    "tcp://*:5557" 
+#define ZMQ_HOST_ch5    "tcp://*:5556"
+#define ZMQ_HOST_ch2    "tcp://*:5555" 
 
 // the PRU clock speed used for GPIO clock generation
-
 #define PRU_CLK 200e6
 
-
-
-//--------set freq in pwm module------
-void set_freq(float freq_hz){
+void set_freq(float freq_hz){   //Set freq in pwm module
    FILE *fp;
-   fp=fopen("/sys/devices/platform/ocp/48300000.epwmss/48300200.pwm/pwm/pwmchip0/pwm0/period","w+");
+   fp=fopen("/sys/class/pwm/pwmchip0/pwm0/period","w");
    if (fp == NULL){
-     perror("GPIO: write failed to open file ");
+     perror("GPIO: write failed to open file to set frequency ");
      return;
    }
    float period_s = 1.0f/freq_hz;
@@ -52,24 +53,32 @@ void set_freq(float freq_hz){
    fclose(fp);
    return;
 }
+
+
+
+
 //------set duty cycle in nanoseconds,should not be greater than period----
 void set_DutyCycle(unsigned int duty_ns){
    FILE *fp;
-   fp=fopen("/sys/devices/platform/ocp/48300000.epwmss/48300200.pwm/pwm/pwmchip0/pwm0/duty","w+");
+   fp=fopen("/sys/class/pwm/pwmchip0/pwm0/duty_cycle","w");
    if (fp == NULL){
-     perror("GPIO: write failed to open file ");
+     perror("GPIO: write failed to open file  to set duty cycle");
      return;
    }
    fprintf(fp,"%u",duty_ns);
    fclose(fp);
    return;
 }
+
+
+
+
 //works only when freq is 40kHz
 void set_DutyCycle_40(float percentage){
    FILE *fp;
-   fp=fopen("/sys/devices/platform/ocp/48300000.epwmss/48300200.pwm/pwm/pwmchip0/pwm0/duty","w+");
+   fp=fopen("/sys/class/pwm/pwmchip0/pwm0/duty_cycle","w");
    if (fp == NULL){
-     perror("GPIO: write failed to open file ");
+     perror("GPIO: write failed to open file to set duty cycle");
      return;
    }
    if ((percentage>100.0f)||(percentage<0.0f)){
@@ -83,30 +92,35 @@ void set_DutyCycle_40(float percentage){
    return;
 }
 
+
+
+
 void pwm_enable(){
   FILE *fp;
-   fp=fopen("/sys/devices/platform/ocp/48300000.epwmss/48300200.pwm/pwm/pwmchip0/pwm0/enable","w+");
+   fp=fopen("/sys/class/pwm/pwmchip0/pwm0/enable","w");
    if (fp == NULL){
-     perror("GPIO: write failed to open file ");
+     perror("GPIO: write failed to open file to enable pwm ");
      return;
    }
   fprintf(fp,"%d",1);
   fclose(fp);
-  return;
+  return;}
 
-}
+
+
 void pwm_disable(){
   FILE *fp;
-   fp=fopen("/sys/devices/platform/ocp/48300000.epwmss/48300200.pwm/pwm/pwmchip0/pwm0/enable","w+");
+   fp=fopen("/sys/class/pwm/pwmchip0/pwm0/enable","w");
    if (fp == NULL){
-     perror("GPIO: write failed to open file ");
-     return -1;
+     perror("GPIO: write failed to open file to disable pwm");
+     return;
    }
   fprintf(fp,"%d",0);
   fclose(fp);
-  return;
+  return;}
 
-}
+
+
 
 void sig_handler (int sig) {
   // break out of reading loop
@@ -137,6 +151,15 @@ int main (int argc, char **argv) {
     fprintf(stderr, "prussdrv_open() failed\n");
     return EXIT_FAILURE;
   }
+  
+  void* context = zmq_ctx_new();
+  void* publisher = zmq_socket( context, ZMQ_PUB );
+  zmq_bind( publisher, ZMQ_HOST_ch0);
+  /*zmq_bind( publisher, ZMQ_HOST_ch4);
+  zmq_bind( publisher, ZMQ_HOST_ch1);
+  zmq_bind( publisher, ZMQ_HOST_ch5);
+  zmq_bind( publisher, ZMQ_HOST_ch2);
+  */
 
   pwm_enable();
   set_freq(40000);//frequency supplied in hz
@@ -172,12 +195,17 @@ int main (int argc, char **argv) {
   volatile uint32_t *buffer_end = shared_ddr + (shared_ddr_len / sizeof(*shared_ddr));
 
   // Dummy variable so compiler doesn't optimize away our data.
-  uint32_t foo = 0;
+
   int64_t bytes_read = 0;
-    double loop=0;
+
   while (bCont) {
-    uint32_t *write_pointer_virtual =
-      prussdrv_get_virt_addr(pparams->shared_ptr);
+      fprintf(stderr,"sleeping for 2 seconds\n");
+    sleep(2);
+    pwm_enable();
+    usleep(250);
+    pwm_disable();
+    usleep(1000);
+    uint32_t *write_pointer_virtual =prussdrv_get_virt_addr(pparams->shared_ptr);
 
     while (read_pointer != write_pointer_virtual) {
       // Copy to a local array so we're not working in special slow DMA ram
@@ -185,15 +213,15 @@ int main (int argc, char **argv) {
       memcpy(amplitudes, (void *) read_pointer, 8);
 
       for (int i = 0; i < 6; i++) {
-        
-        zmq_send( publisher, amplitudes[i], bytes, 0 );
+      
+        zmq_send( publisher, &amplitudes[i], sizeof(amplitudes[0]), 0 );
         bytes_read += sizeof(amplitudes[0]);
       }
       // Occasionally report to stderr
       if (bytes_read % (1048576) == 0) {
         fprintf(stderr, "Processed %lldMB\n", bytes_read / 1048576);
         fprintf(stderr,
-                "Most recent amplitude for channel 0:%d  1:%d  4:%d  5:%d\n",
+                "Most recent amplitude for channel 0:%d  1:%d 2:%d 3:%d 4:%d  5:%d \n",
                 amplitudes[0], amplitudes[1], amplitudes[2], amplitudes[3], amplitudes[4], amplitudes[5]);
       }
 
@@ -202,13 +230,6 @@ int main (int argc, char **argv) {
         read_pointer = shared_ddr;
       }
     }
-      if(loop%4000==0){
-          pwm_disable();
-          usleep(100);
-          pwm_enable();          
-      }
-    usleep(1000);
-    loop=loop+1;
   }
 
   fprintf(stderr, "All done\n");

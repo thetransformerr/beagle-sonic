@@ -44,15 +44,15 @@ static int bCont = 1;
 // The PRUs run at 200MHz
 #define PRU_CLK 200e6
 
-#define ZMQ_HOST                "tcp://*:5555" 
-#define ZMQ_SIG    "tcp://*:5556"
+#define ZMQ_HOST_ch1                "tcp://*:5555" 
+#define ZMQ_HOST_ch2    "tcp://*:5556"
 
 //Set freq in pwm module
 void set_freq(float freq_hz){
    FILE *fp;
-   fp=fopen("/sys/devices/platform/ocp/48300000.epwmss/48300200.pwm/pwm/pwmchip0/pwm0/period","w+");
+   fp=fopen("/sys/class/pwm/pwmchip0/pwm0/period","w");
    if (fp == NULL){
-     perror("GPIO: write failed to open file ");
+     perror("GPIO: write failed to open file to set frequency ");
      return;
    }
    float period_s = 1.0f/freq_hz;
@@ -64,9 +64,9 @@ void set_freq(float freq_hz){
 //------set duty cycle in nanoseconds,should not be greater than period----
 void set_DutyCycle(unsigned int duty_ns){
    FILE *fp;
-   fp=fopen("/sys/devices/platform/ocp/48300000.epwmss/48300200.pwm/pwm/pwmchip0/pwm0/duty","w+");
+   fp=fopen("/sys/class/pwm/pwmchip0/pwm0/duty_cycle","w");
    if (fp == NULL){
-     perror("GPIO: write failed to open file ");
+     perror("GPIO: write failed to open file  to set duty cycle");
      return;
    }
    fprintf(fp,"%u",duty_ns);
@@ -76,9 +76,9 @@ void set_DutyCycle(unsigned int duty_ns){
 //works only when freq is 40kHz
 void set_DutyCycle_40(float percentage){
    FILE *fp;
-   fp=fopen("/sys/devices/platform/ocp/48300000.epwmss/48300200.pwm/pwm/pwmchip0/pwm0/duty","w+");
+   fp=fopen("/sys/class/pwm/pwmchip0/pwm0/duty_cycle","w");
    if (fp == NULL){
-     perror("GPIO: write failed to open file ");
+     perror("GPIO: write failed to open file to set duty cycle");
      return;
    }
    if ((percentage>100.0f)||(percentage<0.0f)){
@@ -94,9 +94,9 @@ void set_DutyCycle_40(float percentage){
 
 void pwm_enable(){
   FILE *fp;
-   fp=fopen("/sys/devices/platform/ocp/48300000.epwmss/48300200.pwm/pwm/pwmchip0/pwm0/enable","w+");
+   fp=fopen("/sys/class/pwm/pwmchip0/pwm0/enable","w");
    if (fp == NULL){
-     perror("GPIO: write failed to open file ");
+     perror("GPIO: write failed to open file to enable pwm ");
      return;
    }
   fprintf(fp,"%d",1);
@@ -106,10 +106,10 @@ void pwm_enable(){
 }
 void pwm_disable(){
   FILE *fp;
-   fp=fopen("/sys/devices/platform/ocp/48300000.epwmss/48300200.pwm/pwm/pwmchip0/pwm0/enable","w+");
+   fp=fopen("/sys/class/pwm/pwmchip0/pwm0/enable","w");
    if (fp == NULL){
-     perror("GPIO: write failed to open file ");
-     return -1;
+     perror("GPIO: write failed to open file to disable pwm");
+     return;
    }
   fprintf(fp,"%d",0);
   fclose(fp);
@@ -144,13 +144,13 @@ int main (int argc, char **argv) {
   int channel1_input = 4;
   char* fname = "-";
   FILE* fout = stdout;
-  void* context = zmq_ctx_new();
-  void* publisher = zmq_socket( context, ZMQ_PUB );
-  zmq_bind( publisher, ZMQ_HOST );
-  void* context1 = zmq_ctx_new();
-  void* publisher = zmq_socket( context1, ZMQ_PUB );
-  zmq_bind( publisher, ZMQ_SIG );
-
+  void* context_ch1 = zmq_ctx_new();
+  void* publisher_ch1 = zmq_socket( context_ch1, ZMQ_PUB );
+  zmq_bind( publisher_ch1, ZMQ_HOST_ch1 );
+  void* context_ch2 = zmq_ctx_new();
+  void* publisher_ch2 = zmq_socket( context_ch2, ZMQ_PUB );
+  zmq_bind( publisher_ch2, ZMQ_HOST_ch2 );
+  
 
   // Make sure we're root
   if (geteuid() != 0) {
@@ -307,10 +307,12 @@ int main (int argc, char **argv) {
   time_t now = time(NULL);
   time_t start_time = now;
   uint32_t bytes_read = 0;
+  uint16_t channel1=0;
+  uint16_t channel2=0;
   int loops = 0;
   while (bCont) {
-    printf("sleeping for 2 seconds\n");
-    sleep(2000);
+    fprintf(stderr,"sleeping for 2 seconds\n");
+    sleep(2);
     pwm_enable();
     usleep(250);
     pwm_disable();
@@ -341,10 +343,14 @@ int main (int argc, char **argv) {
       for (int i = 0; i < (write_index - read_index); i++) {
         // Keep just the lower 10 bits from each 16-bit half of the 32-bit word
         local_buf[i] &= 0x03ff03ff;
+        channel1=local_buf[i];
+        zmq_send( publisher_ch1, &channel1, 2, 0 );
+        channel2=(local_buf[i] >  > 16);
+        zmq_send(publisher_ch2,&channel2,sizeof(channel2),0);
       }
 
-      //fwrite(local_buf, bytes, 1, fout);
-      zmq_send( publisher, local_buf, bytes, 0 );
+      fwrite(local_buf, bytes, 1, fout);
+      
 
     } else {
       // The write pointer has wrapped around, so we'll copy out the data
@@ -357,6 +363,11 @@ int main (int argc, char **argv) {
 
       for (int i = 0; i < tail_words; i++) {
         local_buf[i] &= 0x03ff03ff;
+        channel1=local_buf[i];
+        zmq_send( publisher_ch1, &channel1, 2, 0 );
+        channel2=(local_buf[i] >> 16);
+        zmq_send(publisher_ch2,&channel2,sizeof(channel2),0);
+
       }
 
       int head_bytes = write_index * sizeof(*shared_ddr);
@@ -365,11 +376,13 @@ int main (int argc, char **argv) {
 
       for (int i = 0; i < write_index; i++) {
         local_buf[tail_words + i] &= 0x03ff03ff;
+        channel1=local_buf[i];
+        zmq_send( publisher_ch1, &channel1, 2, 0 );
+        channel2=(local_buf[i] >> 16);
+        zmq_send(publisher_ch2,&channel2,sizeof(channel2),0);
       }
 
-     // fwrite(local_buf, tail_bytes + head_bytes, 1, fout);
-      zmq_send( publisher, local_buf, tail_bytes + head_bytes , 0 );
-      
+      fwrite(local_buf, tail_bytes + head_bytes, 1, fout);      
     }
     read_index = write_index;
 
