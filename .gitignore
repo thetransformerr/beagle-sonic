@@ -10,3 +10,4 @@ gen/
 *.dtbo
 prudaq_capture
 tof_analysis
+.DS_store

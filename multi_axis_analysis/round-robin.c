@@ -155,11 +155,11 @@ int main (int argc, char **argv) {
   void* context = zmq_ctx_new();
   void* publisher = zmq_socket( context, ZMQ_PUB );
   zmq_bind( publisher, ZMQ_HOST_ch0);
-  /*zmq_bind( publisher, ZMQ_HOST_ch4);
+  zmq_bind( publisher, ZMQ_HOST_ch4);
   zmq_bind( publisher, ZMQ_HOST_ch1);
   zmq_bind( publisher, ZMQ_HOST_ch5);
   zmq_bind( publisher, ZMQ_HOST_ch2);
-  */
+  
 
   pwm_enable();
   set_freq(40000);//frequency supplied in hz
