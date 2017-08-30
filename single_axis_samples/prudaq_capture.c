@@ -46,6 +46,7 @@ static int bCont = 1;
 
 #define ZMQ_HOST_ch1                "tcp://*:5555" 
 #define ZMQ_HOST_ch2    "tcp://*:5556"
+#define ZMQ_SLEEP "tcp://*:7897"
 
 //Set freq in pwm module
 void set_freq(float freq_hz){
@@ -150,7 +151,9 @@ int main (int argc, char **argv) {
   void* context_ch2 = zmq_ctx_new();
   void* publisher_ch2 = zmq_socket( context_ch2, ZMQ_PUB );
   zmq_bind( publisher_ch2, ZMQ_HOST_ch2 );
-  
+  void* context_ch3 = zmq_ctx_new();
+  void* publisher_ch3 = zmq_socket( context_ch3, ZMQ_PUB );
+  zmq_bind( publisher_ch3, ZMQ_SLEEP );
 
   // Make sure we're root
   if (geteuid() != 0) {
@@ -313,10 +316,15 @@ int main (int argc, char **argv) {
   while (bCont) {
     fprintf(stderr,"sleeping for 2 seconds\n");
     sleep(2);
+    if(loops>1){
+    uint32_t *write_pointer_virtual = prussdrv_get_virt_addr(pparams->shared_ptr);
+    uint32_t read_index = write_pointer_virtual - shared_ddr;}
+    usleep(500);
     pwm_enable();
     usleep(150);
     pwm_disable();
-    usleep(1000);
+    usleep(1500);
+    zmq_send( publisher_ch3, "WAKE", 1, 0 );
     
     // Reading from shared memory and PRU RAM is significantly slower than normal
     // memory, so we loop below rather than checking shared_ptr every time, and

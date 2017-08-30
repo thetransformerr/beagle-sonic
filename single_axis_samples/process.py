@@ -20,7 +20,6 @@ import math
 import time
 import numpy as np
 import hexdump as hx
---------------------
 # TODO: Take port as input
 zmq_CH1 = "tcp://localhost:5555"
 zmq_CH2 = "tcp://localhost:5556"
@@ -34,6 +33,14 @@ zmq_sample_subscriber_ch2.connect( zmq_CH2 )
 zmq_sample_subscriber_ch1.connect( zmq_CH1 )
 zmq_sample_subscriber_ch1.setsockopt( zmq.SUBSCRIBE, "" )
 zmq_sample_subscriber_ch2.setsockopt( zmq.SUBSCRIBE, "" )  # Listen to all messages on socket
+zmq_SW = "tcp://localhost:7897"
+zmq_context_SW = zmq.Context()
+zmq_sample_subscriber_SW = zmq_context_SW.socket( zmq.SUB )
+zmq_sample_subscriber_SW.setsockopt( zmq.CONFLATE, 1 )
+zmq_sample_subscriber_SW.connect( zmq_SW )
+zmq_sample_subscriber_SW.setsockopt( zmq.SUBSCRIBE, "")
+
+
 def get_samples(): #collect abt 1000 samples for each channel for rate at 200k samples and 
                    #axis distance of 15 cm
    samples_count=0
@@ -88,6 +95,7 @@ def find_windspeed( temp,tof ):
 
 def run():
    while True:
+      delay=zmq_sample_subscriber_SW.recv() #.recv() blocks execution until we receive Wake flag from C
       temp = get_temp()
       samples_x_rx_sensor,samples_x_tx_sensor=get_samples()
 
@@ -99,7 +107,6 @@ def run():
       print( "Temperature: " + str(temp) )
       print( "ToF_x: " + str(tof_x))
       print( "Wind speed=> x: " + str(windspeed_x)+" direction: "+str(direction_x))
-      time.sleep(2) 
 
 
 
