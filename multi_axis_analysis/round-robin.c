@@ -28,14 +28,11 @@ permissions and limitations under the License.
 #include <time.h>
 // Header for sharing info between PRUs and application processor
 #include "shared_header.h"
-#include <signal.h>
 
 static int bCont = 1;
-#define ZMQ_HOST_ch0    "tcp://*:5555" 
-#define ZMQ_HOST_ch4    "tcp://*:5556"
-#define ZMQ_HOST_ch1    "tcp://*:5557" 
-#define ZMQ_HOST_ch5    "tcp://*:5556"
-#define ZMQ_HOST_ch2    "tcp://*:5555" 
+#define ZMQ_HOST_x    "tcp://*:5555" 
+#define ZMQ_HOST_y    "tcp://*:5556"
+#define ZMQ_HOST_temp    "tcp://*:5557" 
 
 // the PRU clock speed used for GPIO clock generation
 #define PRU_CLK 200e6
@@ -152,14 +149,18 @@ int main (int argc, char **argv) {
     return EXIT_FAILURE;
   }
   
-  void* context = zmq_ctx_new();
-  void* publisher = zmq_socket( context, ZMQ_PUB );
-  zmq_bind( publisher, ZMQ_HOST_ch0);
-  zmq_bind( publisher, ZMQ_HOST_ch4);
-  zmq_bind( publisher, ZMQ_HOST_ch1);
-  zmq_bind( publisher, ZMQ_HOST_ch5);
-  zmq_bind( publisher, ZMQ_HOST_ch2);
+  void* context_x = zmq_ctx_new();
+  void* publisher_x = zmq_socket( context_x, ZMQ_PUB );
   
+  void* context_y = zmq_ctx_new();
+  void* publisher_y = zmq_socket( context_y, ZMQ_PUB );
+
+  void* context_temp = zmq_ctx_new();
+  void* publisher_temp = zmq_socket( context_temp, ZMQ_PUB );
+
+  zmq_bind( publisher_x, ZMQ_HOST_x);
+  zmq_bind( publisher_y, ZMQ_HOST_y);
+  zmq_bind( publisher_temp, ZMQ_HOST_temp);  
 
   pwm_enable();
   set_freq(40000);//frequency supplied in hz
@@ -199,7 +200,7 @@ int main (int argc, char **argv) {
   int64_t bytes_read = 0;
 
   while (bCont) {
-      fprintf(stderr,"sleeping for 2 seconds\n");
+    fprintf(stderr,"sleeping for 2 seconds\n");
     sleep(2);
     pwm_enable();
     usleep(250);
@@ -210,13 +211,19 @@ int main (int argc, char **argv) {
     while (read_pointer != write_pointer_virtual) {
       // Copy to a local array so we're not working in special slow DMA ram
       uint16_t amplitudes[6];
-      memcpy(amplitudes, (void *) read_pointer, 8);
+      memcpy(amplitudes, (void *) read_pointer, 12);
 
       for (int i = 0; i < 6; i++) {
-      
-        zmq_send( publisher, &amplitudes[i], sizeof(amplitudes[0]), 0 );
-        bytes_read += sizeof(amplitudes[0]);
+        switch(i){
+          case 0:zmq_send( publisher_x, &amplitudes[i], sizeof(amplitudes[0]), 0 );  //tx for y
+          case 1:zmq_send( publisher_y, &amplitudes[i], sizeof(amplitudes[0]), 0 );  //tx for x
+          case 2:zmq_send(publisher_temp,&amplitudes[i],sizeof(amplitudes[0]),0);   //input for temperature
+          case 3:zmq_send(publisher_x,&amplitudes[i],sizeof(amplitudes[0]),0);  //rx input channel for x  
+          case 4:zmq_send(publisher_y,&amplitudes[i],sizeof(amplitudes[0]),0);  //rx for y
+        }
+          bytes_read += sizeof(amplitudes[0]);
       }
+
       // Occasionally report to stderr
       if (bytes_read % (1048576) == 0) {
         fprintf(stderr, "Processed %lldMB\n", bytes_read / 1048576);
@@ -225,7 +232,7 @@ int main (int argc, char **argv) {
                 amplitudes[0], amplitudes[1], amplitudes[2], amplitudes[3], amplitudes[4], amplitudes[5]);
       }
 
-      read_pointer += (8 / sizeof(*read_pointer));
+      read_pointer += (12 / sizeof(*read_pointer));
       if (read_pointer >= buffer_end) {
         read_pointer = shared_ddr;
       }
@@ -233,10 +240,8 @@ int main (int argc, char **argv) {
   }
 
   fprintf(stderr, "All done\n");
-
   prussdrv_pru_disable(0);
   prussdrv_pru_disable(1);
   prussdrv_exit();
-
   return 0;
 }

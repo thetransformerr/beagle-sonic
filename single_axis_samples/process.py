@@ -1,6 +1,14 @@
 #! /usr/bin/python
 
 #
+# PROCESS.PY
+#
+# Description: Sensor fusion for the sonic anemometer
+#
+
+#! /usr/bin/python
+
+#
 # FUSION.PY
 #
 # Description: Sensor fusion for the sonic anemometer
@@ -12,6 +20,7 @@ import math
 import time
 import numpy as np
 import hexdump as hx
+--------------------
 # TODO: Take port as input
 zmq_CH1 = "tcp://localhost:5555"
 zmq_CH2 = "tcp://localhost:5556"
@@ -32,14 +41,14 @@ def get_samples(): #collect abt 1000 samples for each channel for rate at 200k s
    samples_x_rx_sensor=[]
    temp1=0
    temp2=0
-   while(samples_count <800):
+   while(samples_count < 800):
       temp1=zmq_sample_subscriber_ch1.recv()
-      samples_x_tx_sensor.append(int(temp1,16))
+      temp1=hx.dump(temp1[::-1],size=4,sep=' ')
+      samples_x_tx_sensor.append(int(temp1,16))     
       temp2=zmq_sample_subscriber_ch2.recv()
+      temp2=hx.dump(temp2[::-1],size=4,sep=' ')
       samples_x_rx_sensor.append(int(temp2,16))
       samples_count=samples_count+1
-      print samples_count
-      #print samples_x_rx_sensor[samples_count],samples_x_tx_sensor[samples_count]
    return samples_x_rx_sensor,samples_x_tx_sensor
 
 
@@ -51,7 +60,7 @@ def get_tof(sam_TX,sam_RX):
    normalised_rx=sam_RX-mean
    correlate_np=np.correlate(normalised_tx,normalised_rx,'same')
    tof=np.argmax(correlate_np)-(len(normalised_tx)/2)
-   return tof
+   return tof*(float(1)/400000)
 
 def get_temp():
    temp=25
@@ -66,7 +75,7 @@ axis_distance = 0.15
 def find_windspeed( temp,tof ):
    if (tof!=0):
       pulse_speed=float(axis_distance/tof)
-   else:	
+   else: 
       pulse_speed = 336
    temp += 273.15    # Celsius to Kelvin
    sound_speed=float(20.05*math.sqrt(temp))
@@ -95,4 +104,4 @@ def run():
 
 
 if __name__ == "__main__":
-   run()
+   run()    

@@ -314,7 +314,7 @@ int main (int argc, char **argv) {
     fprintf(stderr,"sleeping for 2 seconds\n");
     sleep(2);
     pwm_enable();
-    usleep(250);
+    usleep(150);
     pwm_disable();
     usleep(1000);
     
@@ -345,8 +345,10 @@ int main (int argc, char **argv) {
         local_buf[i] &= 0x03ff03ff;
         channel1=local_buf[i];
         zmq_send( publisher_ch1, &channel1, 2, 0 );
-        channel2=(local_buf[i] >  > 16);
+        channel2=(local_buf[i] >> 16);
         zmq_send(publisher_ch2,&channel2,sizeof(channel2),0);
+        channel2=0;
+        channel1=0;
       }
 
       fwrite(local_buf, bytes, 1, fout);
@@ -367,7 +369,8 @@ int main (int argc, char **argv) {
         zmq_send( publisher_ch1, &channel1, 2, 0 );
         channel2=(local_buf[i] >> 16);
         zmq_send(publisher_ch2,&channel2,sizeof(channel2),0);
-
+        channel2=0;
+        channel1=0;
       }
 
       int head_bytes = write_index * sizeof(*shared_ddr);
@@ -380,6 +383,8 @@ int main (int argc, char **argv) {
         zmq_send( publisher_ch1, &channel1, 2, 0 );
         channel2=(local_buf[i] >> 16);
         zmq_send(publisher_ch2,&channel2,sizeof(channel2),0);
+        channel2=0;
+        channel1=0;
       }
 
       fwrite(local_buf, tail_bytes + head_bytes, 1, fout);      
