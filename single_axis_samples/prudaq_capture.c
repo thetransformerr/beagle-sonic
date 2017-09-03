@@ -318,7 +318,7 @@ int main (int argc, char **argv) {
     sleep(2);
     if(loops>1){
     uint32_t *write_pointer_virtual = prussdrv_get_virt_addr(pparams->shared_ptr);
-    uint32_t read_index = write_pointer_virtual - shared_ddr;}
+    read_index = write_pointer_virtual - shared_ddr;}
     usleep(500);
     pwm_enable();
     usleep(150);
