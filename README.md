@@ -8,6 +8,9 @@ Started with GSoC-2016, once completed would prove a great open-source project f
 
 This Repository is under development hence frequent changes are obvious and you can refer wiki https://github.com/thetransformerr/beagle-sonic/wiki for latest development.
 
+Here is the final presentation video for GSoC-17:
+https://www.youtube.com/watch?v=vnOUQEhiibA
+
 Thanks!!
 
 Naveen Saini
